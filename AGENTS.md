@@ -17,6 +17,7 @@ Agents MUST treat the following as authoritative:
 - MVP.md
 - TECH_IMPLEMENTATION.md
 - UX_FLOW.md
+- dreamer_jira.csv
 
 ### Rules
 - Always scan `/documentation` **before** proposing solutions or writing code.

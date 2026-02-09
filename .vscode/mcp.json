@@ -1,0 +1,26 @@
+{
+  "servers": {
+    "github-mcp": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "chrome-devtools": {
+        "command": "npx",
+        "args": ["-y", "chrome-devtools-mcp@latest"]
+    },
+      "figma": {
+            "type": "http",
+            "url": "https://mcp.figma.com/mcp"
+          },
+      "com.atlassian/atlassian-mcp-server": {
+        "type": "http",
+        "url": "https://mcp.atlassian.com/v1/mcp"
+    }
+  }
+}
