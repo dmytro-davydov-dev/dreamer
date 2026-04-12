@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Firestore } from "firebase/firestore";
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import type { DreamId, UID } from "../../../shared/types/domain";
 import type {
@@ -135,52 +144,95 @@ export default function DreamEntryPage({
   };
 
   return (
-    <main aria-label="Dream Entry">
-      <header>
-        <h1>Record your dream</h1>
-        <p>Capture your dream as you remember it.</p>
-      </header>
+    <Box
+      component="main"
+      aria-label="Dream Entry"
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "var(--color-bg-primary, #080c14)",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="md">
+        <Stack spacing={4}>
+          {/* Header */}
+          <Stack spacing={1}>
+            <Typography
+              variant="overline"
+              sx={{ color: "var(--color-text-muted, #64748b)" }}
+            >
+              Dreamer · Step 1
+            </Typography>
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
+            >
+              Record your dream
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 520 }}
+            >
+              Capture your dream as you remember it — no detail is too small.
+            </Typography>
+          </Stack>
 
-      <section>
-        <label htmlFor="dream-text">Dream</label>
-        <textarea
-          id="dream-text"
-          name="dreamText"
-          placeholder="Write your dream as you remember it..."
-          value={rawText}
-          onChange={(event) => setRawText(event.target.value)}
-          onBlur={handleBlur}
-          rows={8}
-        />
-      </section>
+          {/* Dream text */}
+          <TextField
+            id="dream-text"
+            name="dreamText"
+            label="Dream"
+            placeholder="Write your dream as you remember it..."
+            multiline
+            minRows={8}
+            value={rawText}
+            onChange={(e) => setRawText(e.target.value)}
+            onBlur={handleBlur}
+            fullWidth
+          />
 
-      <section>
-        <label htmlFor="dream-mood">Waking mood (optional)</label>
-        <input
-          id="dream-mood"
-          name="mood"
-          type="text"
-          value={mood}
-          onChange={(event) => setMood(event.target.value)}
-          onBlur={handleBlur}
-        />
-      </section>
+          {/* Mood */}
+          <TextField
+            id="dream-mood"
+            name="mood"
+            label="Waking mood (optional)"
+            placeholder="e.g. anxious, peaceful, curious..."
+            value={mood}
+            onChange={(e) => setMood(e.target.value)}
+            onBlur={handleBlur}
+            fullWidth
+          />
 
-      <section>
-        <label htmlFor="dream-context">Life context (optional)</label>
-        <textarea
-          id="dream-context"
-          name="lifeContext"
-          value={lifeContext}
-          onChange={(event) => setLifeContext(event.target.value)}
-          onBlur={handleBlur}
-          rows={4}
-        />
-      </section>
+          {/* Life context */}
+          <TextField
+            id="dream-context"
+            name="lifeContext"
+            label="Life context (optional)"
+            placeholder="What's been on your mind lately?"
+            multiline
+            minRows={4}
+            value={lifeContext}
+            onChange={(e) => setLifeContext(e.target.value)}
+            onBlur={handleBlur}
+            fullWidth
+          />
 
-      <button type="button" disabled={!isContinueEnabled} onClick={handleContinue}>
-        Continue
-      </button>
-    </main>
+          {/* Continue */}
+          <Stack direction="row" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              endIcon={<ArrowForwardIcon />}
+              disabled={!isContinueEnabled}
+              onClick={handleContinue}
+              sx={{ minWidth: 160 }}
+            >
+              Continue
+            </Button>
+          </Stack>
+        </Stack>
+      </Container>
+    </Box>
   );
 }

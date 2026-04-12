@@ -57,7 +57,7 @@ export default function SettingsPage() {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "var(--color-bg-primary, #FAFAF8)",
+        backgroundColor: "var(--color-bg-primary, #080c14)",
         py: 4,
       }}
     >
@@ -65,20 +65,13 @@ export default function SettingsPage() {
         <Stack spacing={4}>
           {/* Header */}
           <Stack spacing={1}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: "var(--color-text-secondary, #5F5F5A)",
-                fontSize: "12px",
-                letterSpacing: "0.1em",
-              }}
-            >
+            <Typography variant="overline" sx={{ color: "var(--color-text-muted, #64748b)" }}>
               Dreamer
             </Typography>
             <Typography
               variant="h4"
               component="h1"
-              sx={{ color: "var(--color-text-primary, #1E1E1C)", fontWeight: 600 }}
+              sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
               Settings
             </Typography>
@@ -89,52 +82,44 @@ export default function SettingsPage() {
             variant="outlined"
             sx={{
               p: 3,
-              borderColor: "var(--color-border-subtle, #E3E3DD)",
-              backgroundColor: "var(--color-bg-card, #FFFFFF)",
+              borderColor: "rgba(0, 212, 255, 0.12)",
+              backgroundColor: "rgba(15, 22, 41, 0.8)",
+              backdropFilter: "blur(8px)",
             }}
           >
             <Stack spacing={3}>
               <Stack spacing={1}>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <KeyIcon
-                    sx={{ color: "var(--color-accent-primary, #6B705C)", fontSize: 20 }}
-                  />
+                  <KeyIcon sx={{ color: "#00d4ff", fontSize: 20 }} />
                   <Typography
                     variant="h6"
                     component="h2"
-                    sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
                     AI API Key
                   </Typography>
                 </Stack>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
-                >
+                <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
                   Dreamer uses a Bring-Your-Own-Key model. Your key is stored only in
                   this browser and is never sent to our servers.
                 </Typography>
               </Stack>
 
-              <Divider sx={{ borderColor: "var(--color-border-subtle, #E3E3DD)" }} />
+              <Divider />
 
               {/* Current key status */}
               {keyIsSet && maskedKey ? (
                 <Stack spacing={2}>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <CheckCircleOutlineIcon
-                      sx={{ color: "#4caf50", fontSize: 18 }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
-                    >
+                    <CheckCircleOutlineIcon sx={{ color: "#10b981", fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
                       Key saved:{" "}
                       <Box
                         component="span"
                         sx={{
-                          fontFamily: "monospace",
-                          color: "var(--color-text-primary, #1E1E1C)",
+                          fontFamily: '"JetBrains Mono", monospace',
+                          color: "#00d4ff",
+                          fontSize: "0.8rem",
                         }}
                       >
                         {maskedKey}
@@ -155,10 +140,7 @@ export default function SettingsPage() {
 
               {/* Key input */}
               <Stack spacing={2}>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
-                >
+                <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
                   {keyIsSet ? "Replace with a new key:" : "Enter your OpenAI-compatible API key:"}
                 </Typography>
                 <TextField
@@ -167,9 +149,7 @@ export default function SettingsPage() {
                   type={showKey ? "text" : "password"}
                   value={keyInput}
                   onChange={(e) => setKeyInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSave();
-                  }}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
                   size="small"
                   fullWidth
                   autoComplete="off"
@@ -191,24 +171,13 @@ export default function SettingsPage() {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
-                    },
-                  }}
                 />
                 <Button
                   variant="contained"
+                  color="primary"
                   onClick={handleSave}
                   disabled={!keyInput.trim()}
-                  sx={{
-                    alignSelf: "flex-start",
-                    backgroundColor: "var(--color-accent-primary, #6B705C)",
-                    "&:hover": {
-                      backgroundColor: "var(--color-accent-primary, #6B705C)",
-                      opacity: 0.9,
-                    },
-                  }}
+                  sx={{ alignSelf: "flex-start" }}
                 >
                   Save key
                 </Button>
@@ -219,7 +188,7 @@ export default function SettingsPage() {
                 )}
               </Stack>
 
-              <Divider sx={{ borderColor: "var(--color-border-subtle, #E3E3DD)" }} />
+              <Divider />
 
               {/* Privacy note */}
               <Alert severity="info" icon={false} sx={{ py: 1 }}>

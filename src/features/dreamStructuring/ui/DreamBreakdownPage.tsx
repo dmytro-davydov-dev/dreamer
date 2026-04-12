@@ -94,12 +94,12 @@ const KIND_LABELS: Record<ElementKind, string> = {
 };
 
 const KIND_COLORS: Record<ElementKind, string> = {
-  symbol: "#7C6F9B",
-  character: "#6B705C",
-  place: "#8B7355",
-  emotion: "#A05A5A",
-  action: "#5A7A8B",
-  shift: "#6B8B5A",
+  symbol: "#a78bfa",
+  character: "#00d4ff",
+  place: "#f59e0b",
+  emotion: "#f472b6",
+  action: "#10b981",
+  shift: "#61dafb",
 };
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -152,8 +152,8 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
       sx={{
         px: 2,
         py: 1.5,
-        borderColor: "var(--color-border-subtle, #E3E3DD)",
-        backgroundColor: "var(--color-bg-card, #FFFFFF)",
+        borderColor: "rgba(0, 212, 255, 0.12)",
+        backgroundColor: "rgba(15, 22, 41, 0.8)",
         display: "flex",
         alignItems: "center",
         gap: 1.5,
@@ -186,7 +186,7 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
           <Typography
             variant="body2"
             sx={{
-              color: "var(--color-text-primary, #1E1E1C)",
+              color: "var(--color-text-primary, #e2e8f0)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -199,7 +199,7 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
           <Typography
             variant="caption"
             sx={{
-              color: "var(--color-text-muted, #8C8C86)",
+              color: "var(--color-text-muted, #64748b)",
               display: "block",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -220,7 +220,7 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
         {editing ? (
           <Tooltip title="Confirm">
             <IconButton size="small" onClick={commitEdit} aria-label="Confirm edit">
-              <CheckIcon fontSize="small" sx={{ color: "var(--color-accent-primary, #6B705C)" }} />
+              <CheckIcon fontSize="small" sx={{ color: "var(--color-accent-primary, #00d4ff)" }} />
             </IconButton>
           </Tooltip>
         ) : (
@@ -230,7 +230,7 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
               onClick={() => setEditing(true)}
               aria-label="Edit element label"
             >
-              <EditIcon fontSize="small" sx={{ color: "var(--color-text-secondary, #5F5F5A)" }} />
+              <EditIcon fontSize="small" sx={{ color: "var(--color-text-secondary, #94a3b8)" }} />
             </IconButton>
           </Tooltip>
         )}
@@ -242,7 +242,7 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
           >
             <DeleteOutlineIcon
               fontSize="small"
-              sx={{ color: "var(--color-text-muted, #8C8C86)" }}
+              sx={{ color: "var(--color-text-muted, #64748b)" }}
             />
           </IconButton>
         </Tooltip>
@@ -282,11 +282,11 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
         startIcon={<AddIcon />}
         onClick={() => setOpen(true)}
         sx={{
-          color: "var(--color-text-muted, #8C8C86)",
+          color: "var(--color-text-muted, #64748b)",
           textTransform: "none",
           fontSize: "12px",
           alignSelf: "flex-start",
-          "&:hover": { color: "var(--color-accent-primary, #6B705C)" },
+          "&:hover": { color: "var(--color-accent-primary, #00d4ff)" },
         }}
       >
         Add {KIND_LABELS[kind].toLowerCase().replace(/s$/, "")}
@@ -314,7 +314,7 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
           width: 200,
           "& .MuiInputBase-root": {
             fontSize: "13px",
-            backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
+            backgroundColor: "rgba(15, 22, 41, 0.6)",
           },
         }}
       />
@@ -480,7 +480,7 @@ export default function DreamBreakdownPage({
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "var(--color-bg-primary, #FAFAF8)",
+        backgroundColor: "var(--color-bg-primary, #080c14)",
         py: 4,
       }}
     >
@@ -490,24 +490,20 @@ export default function DreamBreakdownPage({
           <Stack spacing={1}>
             <Typography
               variant="overline"
-              sx={{
-                color: "var(--color-text-secondary, #5F5F5A)",
-                fontSize: "12px",
-                letterSpacing: "0.1em",
-              }}
+              sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
               Dreamer · Step 2
             </Typography>
             <Typography
               variant="h4"
               component="h1"
-              sx={{ color: "var(--color-text-primary, #1E1E1C)", fontWeight: 600 }}
+              sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
               Dream Breakdown
             </Typography>
             <Typography
               variant="body1"
-              sx={{ color: "var(--color-text-secondary, #5F5F5A)", maxWidth: 560 }}
+              sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 560 }}
             >
               These are the elements Dreamer found in your dream. Edit, remove, or
               add anything that feels more accurate — your sense of the dream is
@@ -540,14 +536,14 @@ export default function DreamBreakdownPage({
                   variant="outlined"
                   sx={{
                     p: 2.5,
-                    borderColor: "var(--color-border-subtle, #E3E3DD)",
-                    backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
+                    borderColor: "rgba(0, 212, 255, 0.12)",
+                    backgroundColor: "rgba(15, 22, 41, 0.6)",
                   }}
                 >
                   <Typography
                     variant="caption"
                     sx={{
-                      color: "var(--color-text-muted, #8C8C86)",
+                      color: "var(--color-text-muted, #64748b)",
                       display: "block",
                       mb: 1,
                       textTransform: "uppercase",
@@ -559,7 +555,7 @@ export default function DreamBreakdownPage({
                   <Typography
                     variant="body2"
                     sx={{
-                      color: "var(--color-text-secondary, #5F5F5A)",
+                      color: "var(--color-text-secondary, #94a3b8)",
                       whiteSpace: "pre-wrap",
                       maxHeight: 120,
                       overflow: "hidden",
@@ -578,21 +574,21 @@ export default function DreamBreakdownPage({
                   variant="outlined"
                   sx={{
                     p: 3,
-                    borderColor: "var(--color-border-subtle, #E3E3DD)",
-                    backgroundColor: "var(--color-bg-card, #FFFFFF)",
+                    borderColor: "rgba(0, 212, 255, 0.12)",
+                    backgroundColor: "rgba(15, 22, 41, 0.8)",
                   }}
                 >
                   <Stack spacing={2.5}>
                     <Typography
                       variant="h6"
                       component="h2"
-                      sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                      sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                     >
                       Extract elements
                     </Typography>
                     <Typography
                       variant="body2"
-                      sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
+                      sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                     >
                       Dreamer will read your dream and identify its characters,
                       symbols, places, emotions, and actions — without any
@@ -603,6 +599,7 @@ export default function DreamBreakdownPage({
                       <Stack spacing={1.5}>
                         <Button
                           variant="contained"
+                          color="primary"
                           startIcon={
                             pageStatus === "extracting" ? (
                               <CircularProgress size={16} color="inherit" />
@@ -612,14 +609,7 @@ export default function DreamBreakdownPage({
                           }
                           onClick={handleExtract}
                           disabled={pageStatus === "extracting"}
-                          sx={{
-                            alignSelf: "flex-start",
-                            backgroundColor: "var(--color-accent-primary, #6B705C)",
-                            "&:hover": {
-                              backgroundColor: "var(--color-accent-primary, #6B705C)",
-                              opacity: 0.9,
-                            },
-                          }}
+                          sx={{ alignSelf: "flex-start" }}
                         >
                           {pageStatus === "extracting"
                             ? "Extracting…"
@@ -643,7 +633,7 @@ export default function DreamBreakdownPage({
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Typography
                       variant="body2"
-                      sx={{ color: "var(--color-text-muted, #8C8C86)" }}
+                      sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
                       {elements.filter((e) => !e.data.deleted).length} elements
                     </Typography>
@@ -661,7 +651,7 @@ export default function DreamBreakdownPage({
                         onClick={handleExtract}
                         disabled={pageStatus === "extracting"}
                         sx={{
-                          color: "var(--color-text-muted, #8C8C86)",
+                          color: "var(--color-text-muted, #64748b)",
                           textTransform: "none",
                           fontSize: "12px",
                         }}
@@ -718,7 +708,7 @@ export default function DreamBreakdownPage({
               {hasElements && (
                 <>
                   <Divider
-                    sx={{ borderColor: "var(--color-border-subtle, #E3E3DD)" }}
+                    sx={{ borderColor: "rgba(0, 212, 255, 0.12)" }}
                   />
                   <Stack
                     direction={{ xs: "column", sm: "row" }}
@@ -728,22 +718,16 @@ export default function DreamBreakdownPage({
                   >
                     <Typography
                       variant="body2"
-                      sx={{ color: "var(--color-text-muted, #8C8C86)" }}
+                      sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
                       When you're satisfied, continue to add your personal
                       associations.
                     </Typography>
                     <Button
                       variant="contained"
+                      color="primary"
                       onClick={() => onContinue?.(dreamId)}
-                      sx={{
-                        backgroundColor: "var(--color-accent-primary, #6B705C)",
-                        "&:hover": {
-                          backgroundColor: "var(--color-accent-primary, #6B705C)",
-                          opacity: 0.9,
-                        },
-                        whiteSpace: "nowrap",
-                      }}
+                      sx={{ whiteSpace: "nowrap" }}
                     >
                       Continue to Associations
                     </Button>

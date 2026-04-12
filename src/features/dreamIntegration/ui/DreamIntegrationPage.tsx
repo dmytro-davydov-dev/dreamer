@@ -16,7 +16,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "var(--color-bg-primary, #FAFAF8)",
+        backgroundColor: "var(--color-bg-primary, #080c14)",
         py: 4,
       }}
     >
@@ -26,9 +26,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
             <Typography
               variant="overline"
               sx={{
-                color: "var(--color-text-secondary, #5F5F5A)",
-                fontSize: "12px",
-                letterSpacing: "0.1em",
+                color: "var(--color-text-muted, #64748b)",
               }}
             >
               Dreamer
@@ -37,8 +35,8 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
               variant="h4"
               component="h1"
               sx={{
-                color: "var(--color-text-primary, #1E1E1C)",
-                fontWeight: 600,
+                color: "var(--color-text-primary, #e2e8f0)",
+                fontWeight: 700,
               }}
             >
               Integration
@@ -50,20 +48,20 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
               variant="outlined"
               sx={{
                 p: 3,
-                borderColor: "var(--color-border-subtle, #E3E3DD)",
-                backgroundColor: "var(--color-bg-card, #FFFFFF)",
+                borderColor: "rgba(0, 212, 255, 0.12)",
+                backgroundColor: "rgba(15, 22, 41, 0.8)",
               }}
             >
               <Stack spacing={2}>
                 <Typography
                   variant="h6"
-                  sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                  sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                 >
                   Choose a dream to continue integration
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "var(--color-text-muted, #8C8C86)" }}
+                  sx={{ color: "var(--color-text-muted, #64748b)" }}
                 >
                   Select a dream from your history or record a new one to begin
                   integration.
@@ -71,26 +69,17 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Button
                     variant="outlined"
+                    color="primary"
                     component={NavLink}
                     to="/"
-                    sx={{
-                      borderColor: "var(--color-accent-primary, #6B705C)",
-                      color: "var(--color-accent-primary, #6B705C)",
-                    }}
                   >
                     View Dashboard
                   </Button>
                   <Button
                     variant="contained"
+                    color="primary"
                     component={NavLink}
                     to="/dreams/new"
-                    sx={{
-                      backgroundColor: "var(--color-accent-primary, #6B705C)",
-                      "&:hover": {
-                        backgroundColor: "var(--color-accent-primary, #6B705C)",
-                        opacity: 0.9,
-                      },
-                    }}
                   >
                     Record a Dream
                   </Button>
@@ -111,13 +100,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                   <Typography
                     variant="h6"
                     component="h2"
-                    sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
                     Reflective Summary
                   </Typography>
                   <Typography
                     variant="body1"
-                    sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
+                    sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                   >
                     This is a gentle summary of what has surfaced so far. Let it
                     be a starting point rather than a conclusion.
@@ -137,7 +126,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                   <Typography
                     variant="h6"
                     component="h2"
-                    sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
                     Reflective Questions
                   </Typography>
@@ -146,7 +135,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                       <Typography
                         key={question}
                         variant="body1"
-                        sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
+                        sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                       >
                         {question}
                       </Typography>
@@ -167,13 +156,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                   <Typography
                     variant="h6"
                     component="h2"
-                    sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
                     Practice Suggestion
                   </Typography>
                   <Typography
                     variant="body1"
-                    sx={{ color: "var(--color-text-secondary, #5F5F5A)" }}
+                    sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                   >
                     Try a small, grounding action that echoes the dream's feeling
                     or image. Keep it gentle and optional.
@@ -193,7 +182,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                   <Typography
                     variant="h6"
                     component="h2"
-                    sx={{ color: "var(--color-text-primary, #1E1E1C)" }}
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
                     Journal
                   </Typography>
@@ -202,11 +191,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     multiline
                     minRows={4}
                     placeholder="Write anything that feels worth keeping."
-                    sx={{
-                      "& .MuiInputBase-root": {
-                        backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
-                      },
-                    }}
+                    fullWidth
                   />
                 </Stack>
               </Paper>

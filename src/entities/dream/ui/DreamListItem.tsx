@@ -32,10 +32,15 @@ export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
     <Card
       sx={{
         mb: 2,
-        border: "1px solid var(--color-border-subtle, #E3E3DD)",
+        border: "1px solid rgba(0, 212, 255, 0.1)",
         boxShadow: "none",
+        backgroundColor: "rgba(15, 22, 41, 0.8)",
+        backdropFilter: "blur(8px)",
+        transition: "all 0.3s ease",
         "&:hover": {
-          backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
+          borderColor: "rgba(0, 212, 255, 0.28)",
+          boxShadow: "0 8px 32px rgba(0, 212, 255, 0.08)",
+          transform: "translateY(-2px)",
         },
       }}
     >
@@ -45,10 +50,7 @@ export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography
                 variant="caption"
-                sx={{
-                  color: "var(--color-text-secondary, #5F5F5A)",
-                  fontSize: "12px",
-                }}
+                sx={{ color: "var(--color-text-muted, #64748b)" }}
               >
                 {dateStr}
               </Typography>
@@ -58,9 +60,8 @@ export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
             <Typography
               variant="body1"
               sx={{
-                color: "var(--color-text-primary, #1E1E1C)",
-                fontSize: "16px",
-                lineHeight: "26px",
+                color: "var(--color-text-primary, #e2e8f0)",
+                lineHeight: "1.625",
               }}
             >
               {excerpt}
@@ -70,12 +71,12 @@ export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
               <Typography
                 variant="caption"
                 sx={{
-                  color: "var(--color-text-muted, #8C8C86)",
-                  fontSize: "12px",
+                  color: "var(--color-text-muted, #64748b)",
                   fontStyle: "italic",
+                  fontFamily: '"JetBrains Mono", monospace',
                 }}
               >
-                Mood: {data.mood}
+                mood: {data.mood}
               </Typography>
             )}
           </Stack>

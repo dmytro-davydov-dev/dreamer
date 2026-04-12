@@ -1,22 +1,41 @@
 /* Dreamer Design Tokens — CSS Variables */
-/* Generated from design-tokens.json */
+/* Dark theme inspired by dmytro-davydov-dev.github.io */
 :root {
-  /* Colors */
-  --color-bg-primary: #FAFAF8;
-  --color-bg-secondary: #F2F2EE;
-  --color-bg-card: #FFFFFF;
-  --color-border-subtle: #E3E3DD;
-  --color-text-primary: #1E1E1C;
-  --color-text-secondary: #5F5F5A;
-  --color-text-muted: #8C8C86;
-  --color-accent-primary: #6B705C;
-  --color-accent-soft: #DDBEA9;
-  --color-success-soft: #A5B7A0;
-  --color-neutral-soft: #CED4DA;
-  --color-warning-soft: #E6CCB2;
+  /* ── Colors ─────────────────────────────────────────────────── */
+  --color-bg-primary: #080c14;
+  --color-bg-secondary: #0f1629;
+  --color-bg-card: rgba(15, 22, 41, 0.8);
+  --color-border-subtle: rgba(0, 212, 255, 0.1);
+  --color-border-accent: rgba(0, 212, 255, 0.3);
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
 
-  /* Typography */
-  --font-family-primary: Inter;
+  /* Accent */
+  --color-accent-primary: #00d4ff;
+  --color-accent-primary-hover: #33ddff;
+  --color-accent-primary-soft: rgba(0, 212, 255, 0.12);
+  --color-accent-secondary: #7c3aed;
+  --color-accent-secondary-soft: rgba(124, 58, 237, 0.12);
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-success-soft: rgba(16, 185, 129, 0.12);
+  --color-warning: #f59e0b;
+  --color-warning-soft: rgba(245, 158, 11, 0.12);
+  --color-error: #ef4444;
+  --color-error-soft: rgba(239, 68, 68, 0.12);
+
+  /* Gradients */
+  --gradient-accent: linear-gradient(135deg, #00d4ff, #0099bb);
+  --gradient-accent-hover: linear-gradient(135deg, #33ddff, #00c2d4);
+  --gradient-purple: linear-gradient(135deg, #7c3aed, #5b21b6);
+  --gradient-divider: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-family-primary: "Inter", system-ui, -apple-system, sans-serif;
+  --font-family-mono: "JetBrains Mono", "Fira Code", monospace;
+
   --font-heading-xl-size: 28px;
   --font-heading-xl-line: 36px;
   --font-heading-l-size: 22px;
@@ -30,7 +49,7 @@
   --font-meta-size: 12px;
   --font-meta-line: 18px;
 
-  /* Spacing */
+  /* ── Spacing ─────────────────────────────────────────────────── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 16px;
@@ -38,19 +57,27 @@
   --space-5: 32px;
   --space-6: 48px;
 
-  /* Radius */
+  /* ── Radius ──────────────────────────────────────────────────── */
   --radius-default: 8px;
-  --radius-small: 4px;
+  --radius-small: 6px;
+  --radius-card: 12px;
 
-  /* Motion */
+  /* ── Shadows / Glows ─────────────────────────────────────────── */
+  --glow-accent-sm: 0 0 16px rgba(0, 212, 255, 0.25);
+  --glow-accent-md: 0 8px 32px rgba(0, 212, 255, 0.12);
+  --glow-accent-lg: 0 12px 40px rgba(0, 212, 255, 0.2);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+  /* ── Motion ──────────────────────────────────────────────────── */
   --motion-expand-collapse-duration: 200ms;
   --motion-ease-standard: ease-out;
+  --motion-transition: all 0.3s ease;
 
-  /* Accessibility */
+  /* ── Accessibility ───────────────────────────────────────────── */
   --tap-target-min-height: 40px;
 }
 
-/* Optional helper classes */
+/* ── Helper classes ──────────────────────────────────────────────── */
 .dreamer-text-body {
   font-family: var(--font-family-primary);
   font-size: var(--font-body-size);
@@ -61,5 +88,12 @@
 .dreamer-card {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-default);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(8px);
+  transition: var(--motion-transition);
+}
+
+.dreamer-card:hover {
+  border-color: var(--color-border-accent);
+  box-shadow: var(--glow-accent-md);
 }

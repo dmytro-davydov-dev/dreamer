@@ -21,6 +21,8 @@ import DashboardPage from "../screens/DashboardPage";
 import DreamEntryPage from "../features/dreamCapture/ui/DreamEntryPage";
 import DreamIntegrationPage from "../features/dreamIntegration/ui/DreamIntegrationPage";
 import DreamBreakdownPage from "../features/dreamStructuring/ui/DreamBreakdownPage";
+import AssociationsPage from "../features/dreamAssociations/ui/AssociationsPage";
+import InterpretationPage from "../features/dreamInterpretation/ui/InterpretationPage";
 import SettingsPage from "../features/byok/ui/SettingsPage";
 import { ensureAnonymousAuth, getDb } from "./config/firebase";
 import type { DreamId, UID } from "../shared/types/domain";
@@ -42,13 +44,20 @@ function PlaceholderPage({ title, description }: { title: string; description: s
         justifyContent: "center",
         px: 3,
         textAlign: "center",
-        color: "var(--color-text-secondary, #5F5F5A)",
+        color: "var(--color-text-secondary, #94a3b8)",
       }}
     >
-      <Typography variant="h4" sx={{ color: "var(--color-text-primary, #1E1E1C)", mb: 1 }}>
+      <Typography
+        variant="h4"
+        sx={{
+          color: "var(--color-text-primary, #e2e8f0)",
+          mb: 1,
+          fontWeight: 600,
+        }}
+      >
         {title}
       </Typography>
-      <Typography variant="body1" sx={{ maxWidth: 520 }}>
+      <Typography variant="body1" sx={{ maxWidth: 520, color: "var(--color-text-secondary, #94a3b8)" }}>
         {description}
       </Typography>
     </Box>
@@ -303,6 +312,188 @@ function DreamBreakdownRouteByParam({
   );
 }
 
+/** Reusable loader for AssociationsPage */
+function AssociationsLoader({
+  dreamId,
+  onContinue,
+}: {
+  dreamId: DreamId;
+  onContinue?: (id: DreamId) => void;
+}) {
+  const [state, setState] = useState<{
+    status: "loading" | "ready" | "error";
+    db: Firestore | null;
+    uid: UID | null;
+  }>({ status: "loading", db: null, uid: null });
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function init() {
+      try {
+        const user = await ensureAnonymousAuth();
+        if (!isActive) return;
+        setState({ status: "ready", db: getDb(), uid: user.uid as UID });
+      } catch {
+        if (!isActive) return;
+        setState({ status: "error", db: null, uid: null });
+      }
+    }
+
+    init();
+    return () => { isActive = false; };
+  }, []);
+
+  if (state.status === "loading") {
+    return (
+      <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (state.status === "error" || !state.db || !state.uid) {
+    return (
+      <PlaceholderPage
+        title="Associations"
+        description="Could not load this dream. Please return to the Dashboard."
+      />
+    );
+  }
+
+  return (
+    <AssociationsPage
+      db={state.db}
+      uid={state.uid}
+      dreamId={dreamId}
+      onContinue={onContinue}
+    />
+  );
+}
+
+function AssociationsRouteByParam({
+  onDreamSelect,
+}: {
+  onDreamSelect: (id: DreamId) => void;
+}) {
+  const { dreamId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (dreamId) onDreamSelect(dreamId as DreamId);
+  }, [dreamId, onDreamSelect]);
+
+  if (!dreamId) {
+    return (
+      <PlaceholderPage
+        title="Associations"
+        description="No dream selected. Please record a dream first."
+      />
+    );
+  }
+
+  return (
+    <AssociationsLoader
+      dreamId={dreamId as DreamId}
+      onContinue={(id: DreamId) => {
+        onDreamSelect(id);
+        navigate(`/dreams/${id}/interpretation`);
+      }}
+    />
+  );
+}
+
+/** Reusable loader for InterpretationPage */
+function InterpretationLoader({
+  dreamId,
+  onContinue,
+}: {
+  dreamId: DreamId;
+  onContinue?: (id: DreamId) => void;
+}) {
+  const [state, setState] = useState<{
+    status: "loading" | "ready" | "error";
+    db: Firestore | null;
+    uid: UID | null;
+  }>({ status: "loading", db: null, uid: null });
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function init() {
+      try {
+        const user = await ensureAnonymousAuth();
+        if (!isActive) return;
+        setState({ status: "ready", db: getDb(), uid: user.uid as UID });
+      } catch {
+        if (!isActive) return;
+        setState({ status: "error", db: null, uid: null });
+      }
+    }
+
+    init();
+    return () => { isActive = false; };
+  }, []);
+
+  if (state.status === "loading") {
+    return (
+      <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (state.status === "error" || !state.db || !state.uid) {
+    return (
+      <PlaceholderPage
+        title="Interpretation"
+        description="Could not load this dream. Please return to the Dashboard."
+      />
+    );
+  }
+
+  return (
+    <InterpretationPage
+      db={state.db}
+      uid={state.uid}
+      dreamId={dreamId}
+      onContinue={onContinue}
+    />
+  );
+}
+
+function InterpretationRouteByParam({
+  onDreamSelect,
+}: {
+  onDreamSelect: (id: DreamId) => void;
+}) {
+  const { dreamId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (dreamId) onDreamSelect(dreamId as DreamId);
+  }, [dreamId, onDreamSelect]);
+
+  if (!dreamId) {
+    return (
+      <PlaceholderPage
+        title="Interpretation"
+        description="No dream selected. Please record a dream first."
+      />
+    );
+  }
+
+  return (
+    <InterpretationLoader
+      dreamId={dreamId as DreamId}
+      onContinue={(id: DreamId) => {
+        onDreamSelect(id);
+        navigate(`/dreams/${id}/integration`);
+      }}
+    />
+  );
+}
+
 function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeDreamId, setActiveDreamId] = useState<DreamId | null>(null);
@@ -352,14 +543,15 @@ function AppShell() {
   const handleCloseDrawer = () => setDrawerOpen(false);
 
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "var(--color-bg-primary, #FAFAF8)" }}>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "var(--color-bg-primary, #080c14)" }}>
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
-          backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
-          color: "var(--color-text-primary, #1E1E1C)",
-          borderBottom: "1px solid var(--color-border-subtle, #E3E3DD)",
+          backgroundColor: "rgba(8, 12, 20, 0.92)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(0, 212, 255, 0.12)",
+          color: "var(--color-text-primary, #e2e8f0)",
         }}
       >
         <Toolbar>
@@ -368,11 +560,22 @@ function AppShell() {
             color="inherit"
             aria-label="Open menu"
             onClick={() => setDrawerOpen(true)}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, "&:hover": { backgroundColor: "rgba(0, 212, 255, 0.08)" } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              background: "linear-gradient(135deg, #e2e8f0 30%, #00d4ff 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
             Dreamer
           </Typography>
         </Toolbar>
@@ -386,35 +589,47 @@ function AppShell() {
         PaperProps={{
           sx: {
             width: 280,
-            backgroundColor: "var(--color-bg-primary, #FAFAF8)",
-            color: "var(--color-text-primary, #1E1E1C)",
+            backgroundColor: "#0f1629",
+            borderRight: "1px solid rgba(0, 212, 255, 0.1)",
+            color: "var(--color-text-primary, #e2e8f0)",
           },
         }}
       >
-        <Box component="nav" aria-label="Primary navigation" sx={{ mt: 1 }}>
+        <Box component="nav" aria-label="Primary navigation" sx={{ mt: 1, px: 1 }}>
           <List>
             {visibleNavItems.map((item) => (
-              <ListItem key={item.label} disablePadding>
+              <ListItem key={item.label} disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton
                   component={NavLink}
                   to={item.path}
                   onClick={handleCloseDrawer}
                   sx={{
-                    px: 3,
-                    py: 1.5,
-                    color: "inherit",
+                    px: 2,
+                    py: 1.25,
+                    borderRadius: "8px",
+                    color: "var(--color-text-secondary, #94a3b8)",
                     textDecoration: "none",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 212, 255, 0.06)",
+                      color: "var(--color-text-primary, #e2e8f0)",
+                    },
                     "&.active": {
-                      backgroundColor: "var(--color-bg-secondary, #F2F2EE)",
+                      backgroundColor: "rgba(0, 212, 255, 0.08)",
+                      color: "var(--color-accent-primary, #00d4ff)",
+                      borderLeft: "2px solid #00d4ff",
                     },
                   }}
                 >
-                  <ListItemText primary={item.label} />
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{ fontSize: "0.9rem", fontWeight: 500 }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
-          <Divider sx={{ borderColor: "var(--color-border-subtle, #E3E3DD)" }} />
+          <Divider sx={{ borderColor: "rgba(0, 212, 255, 0.1)", mt: 1 }} />
         </Box>
       </Drawer>
 
@@ -449,20 +664,24 @@ function AppShell() {
         <Route
           path="/dreams/associations"
           element={
-            <PlaceholderPage
-              title="Associations"
-              description="Capture personal meanings and emotional tone for each symbol."
-            />
+            activeDreamId ? (
+              <AssociationsLoader
+                dreamId={activeDreamId}
+                onContinue={(id) => {
+                  handleDreamSelect(id);
+                }}
+              />
+            ) : (
+              <PlaceholderPage
+                title="Associations"
+                description="Record a dream first, then come back here to add associations."
+              />
+            )
           }
         />
         <Route
           path="/dreams/:dreamId/associations"
-          element={
-            <PlaceholderPage
-              title="Associations"
-              description="Capture personal meanings and emotional tone for each symbol."
-            />
-          }
+          element={<AssociationsRouteByParam onDreamSelect={handleDreamSelect} />}
         />
         <Route
           path="/dreams/:dreamId/breakdown"
@@ -471,11 +690,24 @@ function AppShell() {
         <Route
           path="/dreams/interpretation"
           element={
-            <PlaceholderPage
-              title="Interpretation"
-              description="Review hypotheses and reflect on how they resonate."
-            />
+            activeDreamId ? (
+              <InterpretationLoader
+                dreamId={activeDreamId}
+                onContinue={(id) => {
+                  handleDreamSelect(id);
+                }}
+              />
+            ) : (
+              <PlaceholderPage
+                title="Interpretation"
+                description="Record a dream first, then come back here to review hypotheses."
+              />
+            )
           }
+        />
+        <Route
+          path="/dreams/:dreamId/interpretation"
+          element={<InterpretationRouteByParam onDreamSelect={handleDreamSelect} />}
         />
         <Route path="/dreams/integration" element={<DreamIntegrationPage />} />
         <Route

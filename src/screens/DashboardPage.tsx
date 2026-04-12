@@ -65,10 +65,10 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "var(--color-bg-primary, #FAFAF8)",
+          backgroundColor: "var(--color-bg-primary, #080c14)",
         }}
       >
-        <CircularProgress />
+        <CircularProgress sx={{ color: "#00d4ff" }} />
       </Box>
     );
   }
@@ -77,7 +77,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "var(--color-bg-primary, #FAFAF8)",
+        backgroundColor: "var(--color-bg-primary, #080c14)",
         py: 4,
       }}
     >
@@ -87,40 +87,23 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
           <Stack spacing={2}>
             <Typography
               variant="overline"
-              sx={{
-                color: "var(--color-text-secondary, #5F5F5A)",
-                fontSize: "12px",
-                letterSpacing: "0.1em",
-              }}
+              sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dreamer
+              Dream Journal
             </Typography>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography
                 variant="h4"
                 component="h1"
-                sx={{
-                  color: "var(--color-text-primary, #1E1E1C)",
-                  fontWeight: 600,
-                }}
+                sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
               >
                 Dream History
               </Typography>
               <Button
                 variant="contained"
+                color="primary"
                 startIcon={<AddIcon />}
                 onClick={handleRecordDream}
-                sx={{
-                  backgroundColor: "var(--color-accent-primary, #6B705C)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-accent-primary, #6B705C)",
-                    opacity: 0.9,
-                  },
-                }}
               >
                 Record a Dream
               </Button>
@@ -132,35 +115,25 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
             <Box
               sx={{
                 textAlign: "center",
-                py: 8,
+                py: 10,
+                border: "1px solid rgba(0, 212, 255, 0.08)",
+                borderRadius: "12px",
+                backgroundColor: "rgba(15, 22, 41, 0.5)",
               }}
             >
               <Typography
                 variant="h6"
-                sx={{
-                  color: "var(--color-text-muted, #8C8C86)",
-                  mb: 2,
-                }}
+                sx={{ color: "var(--color-text-secondary, #94a3b8)", mb: 1.5, fontWeight: 500 }}
               >
                 No dreams yet
               </Typography>
               <Typography
                 variant="body2"
-                sx={{
-                  color: "var(--color-text-muted, #8C8C86)",
-                  mb: 3,
-                }}
+                sx={{ color: "var(--color-text-muted, #64748b)", mb: 4, maxWidth: 360, mx: "auto" }}
               >
                 Start your dreamwork journey by recording your first dream
               </Typography>
-              <Button
-                variant="outlined"
-                onClick={handleRecordDream}
-                sx={{
-                  borderColor: "var(--color-accent-primary, #6B705C)",
-                  color: "var(--color-accent-primary, #6B705C)",
-                }}
-              >
+              <Button variant="outlined" color="primary" onClick={handleRecordDream}>
                 Get Started
               </Button>
             </Box>
