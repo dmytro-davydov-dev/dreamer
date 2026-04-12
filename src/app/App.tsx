@@ -20,6 +20,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DashboardPage from "../screens/DashboardPage";
 import DreamEntryPage from "../features/dreamCapture/ui/DreamEntryPage";
 import DreamIntegrationPage from "../features/dreamIntegration/ui/DreamIntegrationPage";
+import DreamBreakdownPage from "../features/dreamStructuring/ui/DreamBreakdownPage";
+import SettingsPage from "../features/byok/ui/SettingsPage";
 import { ensureAnonymousAuth, getDb } from "./config/firebase";
 import type { DreamId, UID } from "../shared/types/domain";
 
@@ -53,20 +55,6 @@ function PlaceholderPage({ title, description }: { title: string; description: s
   );
 }
 
-function DreamSessionPlaceholder() {
-  const { dreamId } = useParams();
-
-  return (
-    <PlaceholderPage
-      title="Dream Session"
-      description={
-        dreamId
-          ? `Viewing dream ${dreamId}. This screen will host the session view.`
-          : "Select a dream to continue this session."
-      }
-    />
-  );
-}
 
 function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId) => void }) {
   const navigate = useNavigate();
@@ -128,7 +116,7 @@ function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId)
       uid={state.uid}
       onContinue={(dreamId: DreamId) => {
         onDreamSelect(dreamId);
-        navigate(`/dreams/${dreamId}`);
+        navigate(`/dreams/${dreamId}/breakdown`);
       }}
     />
   );
@@ -136,12 +124,63 @@ function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId)
 
 function DreamSessionRoute({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId) => void }) {
   const { dreamId } = useParams();
+  const navigate = useNavigate();
+
+  const [state, setState] = useState<{
+    status: "loading" | "ready" | "error";
+    db: Firestore | null;
+    uid: UID | null;
+  }>({ status: "loading", db: null, uid: null });
 
   useEffect(() => {
     if (dreamId) onDreamSelect(dreamId as DreamId);
   }, [dreamId, onDreamSelect]);
 
-  return <DreamSessionPlaceholder />;
+  useEffect(() => {
+    let isActive = true;
+
+    async function init() {
+      try {
+        const user = await ensureAnonymousAuth();
+        if (!isActive) return;
+        setState({ status: "ready", db: getDb(), uid: user.uid as UID });
+      } catch {
+        if (!isActive) return;
+        setState({ status: "error", db: null, uid: null });
+      }
+    }
+
+    init();
+    return () => { isActive = false; };
+  }, []);
+
+  if (state.status === "loading") {
+    return (
+      <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (state.status === "error" || !state.db || !state.uid || !dreamId) {
+    return (
+      <PlaceholderPage
+        title="Dream Session"
+        description="Could not load this dream. Please return to the Dashboard."
+      />
+    );
+  }
+
+  return (
+    <DreamBreakdownPage
+      db={state.db}
+      uid={state.uid}
+      dreamId={dreamId as DreamId}
+      onContinue={(id: DreamId) => {
+        navigate(`/dreams/${id}/associations`);
+      }}
+    />
+  );
 }
 
 function DreamIntegrationRoute({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId) => void }) {
@@ -152,6 +191,116 @@ function DreamIntegrationRoute({ onDreamSelect }: { onDreamSelect: (dreamId: Dre
   }, [dreamId, onDreamSelect]);
 
   return <DreamIntegrationPage dreamId={dreamId as DreamId | undefined} />;
+}
+
+/** Reusable loader that initialises Firebase + renders DreamBreakdownPage */
+function DreamBreakdownLoader({
+  dreamId,
+  onContinue,
+}: {
+  dreamId: DreamId;
+  onContinue?: (id: DreamId) => void;
+}) {
+  const [state, setState] = useState<{
+    status: "loading" | "ready" | "error";
+    db: Firestore | null;
+    uid: UID | null;
+  }>({ status: "loading", db: null, uid: null });
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function init() {
+      try {
+        const user = await ensureAnonymousAuth();
+        if (!isActive) return;
+        setState({ status: "ready", db: getDb(), uid: user.uid as UID });
+      } catch {
+        if (!isActive) return;
+        setState({ status: "error", db: null, uid: null });
+      }
+    }
+
+    init();
+    return () => { isActive = false; };
+  }, []);
+
+  if (state.status === "loading") {
+    return (
+      <Box sx={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (state.status === "error" || !state.db || !state.uid) {
+    return (
+      <PlaceholderPage
+        title="Dream Breakdown"
+        description="Could not load this dream. Please return to the Dashboard."
+      />
+    );
+  }
+
+  return (
+    <DreamBreakdownPage
+      db={state.db}
+      uid={state.uid}
+      dreamId={dreamId}
+      onContinue={onContinue}
+    />
+  );
+}
+
+function DreamBreakdownRouteFromActive({
+  activeDreamId,
+  onDreamSelect,
+}: {
+  activeDreamId: DreamId;
+  onDreamSelect: (id: DreamId) => void;
+}) {
+  const navigate = useNavigate();
+  return (
+    <DreamBreakdownLoader
+      dreamId={activeDreamId}
+      onContinue={(id: DreamId) => {
+        onDreamSelect(id);
+        navigate(`/dreams/${id}/associations`);
+      }}
+    />
+  );
+}
+
+function DreamBreakdownRouteByParam({
+  onDreamSelect,
+}: {
+  onDreamSelect: (id: DreamId) => void;
+}) {
+  const { dreamId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (dreamId) onDreamSelect(dreamId as DreamId);
+  }, [dreamId, onDreamSelect]);
+
+  if (!dreamId) {
+    return (
+      <PlaceholderPage
+        title="Dream Breakdown"
+        description="No dream selected. Please record a dream first."
+      />
+    );
+  }
+
+  return (
+    <DreamBreakdownLoader
+      dreamId={dreamId as DreamId}
+      onContinue={(id: DreamId) => {
+        onDreamSelect(id);
+        navigate(`/dreams/${id}/associations`);
+      }}
+    />
+  );
 }
 
 function AppShell() {
@@ -182,11 +331,9 @@ function AppShell() {
       { label: "Dashboard", path: "/" },
       { label: "Record a Dream", path: "/dreams/new" },
       {
-        label: "Dream Session View",
-        path: activeDreamId ? `/dreams/${activeDreamId}` : "/dreams/active",
-        requiresActiveDream: true,
+        label: "Dream Breakdown",
+        path: activeDreamId ? `/dreams/${activeDreamId}/breakdown` : "/dreams/breakdown",
       },
-      { label: "Dream Breakdown", path: "/dreams/breakdown" },
       { label: "Associations", path: "/dreams/associations" },
       { label: "Interpretation", path: "/dreams/interpretation" },
       {
@@ -286,10 +433,17 @@ function AppShell() {
         <Route
           path="/dreams/breakdown"
           element={
-            <PlaceholderPage
-              title="Dream Breakdown"
-              description="Structure your dream into characters, symbols, places, and emotions."
-            />
+            activeDreamId ? (
+              <DreamBreakdownRouteFromActive
+                activeDreamId={activeDreamId}
+                onDreamSelect={handleDreamSelect}
+              />
+            ) : (
+              <PlaceholderPage
+                title="Dream Breakdown"
+                description="Record a dream first, then come back here to structure it."
+              />
+            )
           }
         />
         <Route
@@ -300,6 +454,19 @@ function AppShell() {
               description="Capture personal meanings and emotional tone for each symbol."
             />
           }
+        />
+        <Route
+          path="/dreams/:dreamId/associations"
+          element={
+            <PlaceholderPage
+              title="Associations"
+              description="Capture personal meanings and emotional tone for each symbol."
+            />
+          }
+        />
+        <Route
+          path="/dreams/:dreamId/breakdown"
+          element={<DreamBreakdownRouteByParam onDreamSelect={handleDreamSelect} />}
         />
         <Route
           path="/dreams/interpretation"
@@ -315,15 +482,7 @@ function AppShell() {
           path="/dreams/:dreamId/integration"
           element={<DreamIntegrationRoute onDreamSelect={handleDreamSelect} />}
         />
-        <Route
-          path="/settings"
-          element={
-            <PlaceholderPage
-              title="Settings"
-              description="Manage your API key and preferences for Dreamer."
-            />
-          }
-        />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </Box>
   );
