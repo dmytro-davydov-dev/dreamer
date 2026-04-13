@@ -1,6 +1,6 @@
 # TODO.md — Dreamer MVP Progress
 
-> Last updated: 2026-04-12  
+> Last updated: 2026-04-13  
 > Jira project: [DRM board](https://dd77ua.atlassian.net/jira/software/projects/DRM/boards/35)
 
 ---
@@ -26,6 +26,7 @@
 | DRM-26 | BYOK error handling (invalid key / rate limit / network) | `src/services/ai/client/llmClient.ts` — `LlmError` class |
 | DRM-27 | UX_FLOW.md updated with BYOK section + status badges | `documentation/UX_FLOW.md` |
 | DRM-28 | Design tokens: `design-tokens.json` + `DESIGN_TOKENS.md` | `documentation/design-tokens.json`, `DESIGN_TOKENS.md` |
+| DRM-21 | Interpreter stage — hypotheses only (AI), framing + evidence ref normalization | `src/features/dreamInterpretation/service/generateHypotheses.service.ts`, `src/services/ai/prompts/interpreter.ts`, `src/services/ai/schemas/interpreter.schema.ts` |
 
 ---
 
@@ -35,7 +36,6 @@
 
 | Ticket | Summary | Why it matters |
 |--------|---------|----------------|
-| **DRM-21** | Interpreter stage — hypotheses only (AI) | Core of the Jungian flow; without AI-generated hypotheses the session is incomplete |
 | **DRM-13** | Interpretation screen: 2–3 hypothesis cards + user feedback | UI layer for DRM-21; hypothesis cards with thumbs-up/down |
 | **DRM-22** | Integrator stage — reflection + small practice (AI) | Currently a static UI placeholder; needs AI integration |
 | **DRM-17** | Firestore security rules (per-UID isolation) | Required before any public deployment; currently no `firestore.rules` |
@@ -75,8 +75,8 @@
 
 Work in this order to reach a complete end-to-end MVP:
 
-**1. DRM-21 + DRM-13 — Interpreter stage + UI (highest impact)**
-The full dreamwork flow is: capture → breakdown → associations → _interpretation_ → integration. Interpretation is the only AI stage not yet implemented. Add an `interpreterElements.service.ts` with a structured-output prompt generating 2–3 hypothesis cards (framed as "could be...", never as fact), plus an `InterpretationPage.tsx` with card UI and thumbs-up/down feedback stored to Firestore.
+**1. DRM-13 — Interpretation screen polish + feedback UX (highest impact)**
+Interpreter generation is now implemented. Next priority is completing/polishing the interpretation UI flow so users can reliably review 2–3 hypotheses and submit thumbs-up/down feedback with clear loading/error states.
 
 **2. DRM-17 — Firestore security rules**
 Add `firestore.rules` enforcing per-UID isolation: `allow read, write: if request.auth != null && request.auth.uid == resource.data.userId`. Run `firebase emulators:start` to validate before deploy.

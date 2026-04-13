@@ -49,19 +49,56 @@ export interface GenerateHypothesesResult {
   hypotheses: Array<{ id: HypothesisId; data: HypothesisDoc }>;
 }
 
+const HYPOTHESIS_PREFIX_RE =
+  /^(could be|one possibility is|this could suggest|the dream may point to)/i;
+
+const INTERPRETER_LENSES: JungianLens[] = [
+  "compensation",
+  "shadow",
+  "archetypal_dynamics",
+  "relational_anima_animus",
+  "individuation",
+];
+
+function enforceHypothesisFraming(text: string): string {
+  const trimmed = text.trim();
+  if (HYPOTHESIS_PREFIX_RE.test(trimmed)) {
+    return trimmed;
+  }
+  return `Could be that ${trimmed.charAt(0).toLowerCase()}${trimmed.slice(1)}`;
+}
+
+function fallbackDreamQuote(rawText: string): string {
+  const compact = rawText.replace(/\s+/g, " ").trim();
+  if (!compact) return "dream excerpt";
+  return compact.slice(0, 140);
+}
+
 export async function generateHypotheses(
   options: GenerateHypothesesOptions
 ): Promise<GenerateHypothesesResult> {
   const { db, uid, dreamId, dream, elements, associations, apiKey, model } = options;
 
   const elementMap = new Map<ElementId, string>();
+  const elementLabelToId = new Map<string, ElementId>();
   elements.forEach((el) => {
     elementMap.set(el.id, el.data.label);
+    elementLabelToId.set(el.data.label.trim().toLowerCase(), el.id);
   });
+
+  const associationTextToId = new Map<string, AssociationId>();
+  associations.forEach((assoc) => {
+    associationTextToId.set(assoc.data.associationText.trim().toLowerCase(), assoc.id);
+  });
+
+  const validElementIds = new Set(elements.map((el) => el.id));
+  const validAssociationIds = new Set(associations.map((assoc) => assoc.id));
 
   const associationInputs = associations.map((assoc) => {
     const elementLabel = elementMap.get(assoc.data.elementId) || "Unknown";
     return {
+      id: assoc.id,
+      elementId: assoc.data.elementId,
       elementLabel,
       associationText: assoc.data.associationText,
       emotionalValence: assoc.data.emotionalValence,
@@ -79,6 +116,7 @@ export async function generateHypotheses(
         content: buildInterpreterUserPrompt({
           rawText: dream.rawText,
           elements: elements.map((el) => ({
+            id: el.id,
             kind: el.data.kind,
             label: el.data.label,
             evidence: el.data.evidence,
@@ -107,25 +145,88 @@ export async function generateHypotheses(
     response.hypotheses.map((hyp) => {
       const id = doc(collection(db, "_")).id as HypothesisId;
 
-      const validLenses: JungianLens[] = [
-        "compensation",
-        "shadow",
-        "archetypal_dynamics",
-        "relational_anima_animus",
-        "individuation",
-      ];
-      const lens = validLenses.includes(hyp.lens as JungianLens)
+      const lens = INTERPRETER_LENSES.includes(hyp.lens as JungianLens)
         ? (hyp.lens as JungianLens)
         : "compensation";
 
+      const normalizedEvidence = hyp.evidence
+        .map((ev) => {
+          const quote = ev.quote.trim() || fallbackDreamQuote(dream.rawText);
+
+          if (ev.type === "dream_text") {
+            return {
+              type: "dream_text" as const,
+              refId: "dream_text",
+              quote,
+            };
+          }
+
+          if (ev.type === "element") {
+            if (validElementIds.has(ev.refId as ElementId)) {
+              return {
+                type: "element" as const,
+                refId: ev.refId,
+                quote,
+              };
+            }
+
+            const resolvedId = elementLabelToId.get(ev.refId.trim().toLowerCase());
+            if (resolvedId) {
+              return {
+                type: "element" as const,
+                refId: resolvedId,
+                quote,
+              };
+            }
+
+            return null;
+          }
+
+          if (ev.type === "association") {
+            if (validAssociationIds.has(ev.refId as AssociationId)) {
+              return {
+                type: "association" as const,
+                refId: ev.refId,
+                quote,
+              };
+            }
+
+            const resolvedId = associationTextToId.get(ev.refId.trim().toLowerCase());
+            if (resolvedId) {
+              return {
+                type: "association" as const,
+                refId: resolvedId,
+                quote,
+              };
+            }
+
+            return null;
+          }
+
+          return null;
+        })
+        .filter(
+          (
+            ev
+          ): ev is {
+            type: "dream_text" | "element" | "association";
+            refId: string;
+            quote: string;
+          } => ev !== null
+        );
+
+      if (normalizedEvidence.length === 0) {
+        normalizedEvidence.push({
+          type: "dream_text",
+          refId: "dream_text",
+          quote: fallbackDreamQuote(dream.rawText),
+        });
+      }
+
       const data: HypothesisDoc = {
         lens,
-        hypothesisText: hyp.hypothesisText,
-        evidence: hyp.evidence.map((ev) => ({
-          type: ev.type as "dream_text" | "element" | "association",
-          refId: ev.refId,
-          quote: ev.quote,
-        })),
+        hypothesisText: enforceHypothesisFraming(hyp.hypothesisText),
+        evidence: normalizedEvidence,
         reflectiveQuestion: hyp.reflectiveQuestion,
         createdAt,
       };

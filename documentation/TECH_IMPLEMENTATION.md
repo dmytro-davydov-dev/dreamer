@@ -145,6 +145,16 @@ into a context bundle for interpretation.
 - reflective “test” question  
 **Rule:** enforce “hypothesis, not conclusion” framing.
 
+Implementation note (DRM-21, 2026-04-13):
+- The interpreter stage performs post-LLM runtime normalization before Firestore writes.
+- Hypothesis text is enforced to tentative framing (for example: "Could be...", "One possibility is...").
+- Evidence refs are normalized to the Firestore contract `type/refId/quote`.
+- `refId` validation is strict by evidence type:
+  - `dream_text` -> `refId = "dream_text"`
+  - `element` -> must resolve to an existing element ID
+  - `association` -> must resolve to an existing association ID
+- If model evidence is invalid or unmapped, a safe `dream_text` fallback evidence item is stored so hypotheses remain auditable and schema-valid.
+
 ### 4) Integrator (Reflection + small practice)
 **Output:**
 - 1–2 reflective questions
