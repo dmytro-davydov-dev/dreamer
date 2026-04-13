@@ -4,72 +4,72 @@
     "color": {
       "bg": {
         "primary": {
-          "value": "#FAFAF8",
+          "value": "#080c14",
           "type": "color",
-          "description": "Main app background"
+          "description": "Main app background — deep navy"
         },
-        "secondary": {
-          "value": "#F2F2EE",
+        "surface": {
+          "value": "#0b1120",
           "type": "color",
-          "description": "Subtle section background"
+          "description": "Slightly lighter surface layer"
         },
         "card": {
-          "value": "#FFFFFF",
+          "value": "#0f1629",
           "type": "color",
-          "description": "Cards, inputs background"
+          "description": "Cards, modals, elevated surfaces"
         }
       },
       "border": {
         "subtle": {
-          "value": "#E3E3DD",
+          "value": "rgba(255,255,255,0.08)",
           "type": "color",
           "description": "Dividers, card borders"
         }
       },
       "text": {
         "primary": {
-          "value": "#1E1E1C",
+          "value": "#e2e8f0",
           "type": "color",
-          "description": "Primary reading text"
+          "description": "Primary reading text (Tailwind slate-200)"
         },
         "secondary": {
-          "value": "#5F5F5A",
+          "value": "#94a3b8",
           "type": "color",
-          "description": "Labels, hints"
+          "description": "Labels, hints (Tailwind slate-400)"
         },
         "muted": {
-          "value": "#8C8C86",
+          "value": "#475569",
           "type": "color",
-          "description": "Metadata, placeholders"
+          "description": "Metadata, placeholders (Tailwind slate-600)"
         }
       },
       "accent": {
         "primary": {
-          "value": "#6B705C",
+          "value": "#00d4ff",
           "type": "color",
-          "description": "Grounded accent"
+          "description": "Cyan — primary interactive accent"
         },
-        "soft": {
-          "value": "#DDBEA9",
+        "purple": {
+          "value": "#7c3aed",
           "type": "color",
-          "description": "Warm reflection accent"
+          "description": "Violet — secondary / AI accent"
         }
       },
       "semantic": {
-        "successSoft": {
-          "value": "#A5B7A0",
+        "positive": {
+          "value": "#4ade80",
           "type": "color",
-          "description": "Resonates feedback"
+          "description": "Success / resonance (green-400)"
         },
-        "neutralSoft": {
-          "value": "#CED4DA",
+        "negative": {
+          "value": "#f87171",
           "type": "color",
-          "description": "Neutral states"
+          "description": "Error / alert (red-400)"
         },
-        "warningSoft": {
-          "value": "#E6CCB2",
+        "warning": {
+          "value": "#fbbf24",
           "type": "color",
-          "description": "Gentle caution"
+          "description": "Caution (amber-400)"
         }
       }
     },
@@ -78,57 +78,63 @@
         "primary": {
           "value": "Inter",
           "type": "fontFamilies",
-          "description": "Primary UI font (swap to Source Serif 4 / IBM Plex Serif if desired)"
+          "description": "Sole UI font"
         }
       },
       "fontSize": {
-        "headingXL": {
-          "value": 28,
-          "type": "fontSizes"
+        "display": {
+          "value": 56,
+          "type": "fontSizes",
+          "description": "Hero / product name"
         },
-        "headingL": {
-          "value": 22,
-          "type": "fontSizes"
+        "heading1": {
+          "value": 32,
+          "type": "fontSizes",
+          "description": "Page headings"
         },
-        "headingM": {
-          "value": 18,
-          "type": "fontSizes"
+        "heading2": {
+          "value": 24,
+          "type": "fontSizes",
+          "description": "Section headings"
         },
-        "body": {
+        "body1": {
           "value": 16,
-          "type": "fontSizes"
+          "type": "fontSizes",
+          "description": "Primary reading text"
         },
-        "bodySmall": {
+        "body2": {
           "value": 14,
-          "type": "fontSizes"
+          "type": "fontSizes",
+          "description": "Secondary text, labels"
         },
-        "meta": {
+        "caption": {
           "value": 12,
-          "type": "fontSizes"
+          "type": "fontSizes",
+          "description": "Meta, timestamps"
         }
       },
       "lineHeight": {
-        "headingXL": {
-          "value": 36,
+        "display": {
+          "value": 64,
           "type": "lineHeights"
         },
-        "headingL": {
-          "value": 30,
+        "heading1": {
+          "value": 40,
           "type": "lineHeights"
         },
-        "headingM": {
+        "heading2": {
+          "value": 32,
+          "type": "lineHeights"
+        },
+        "body1": {
           "value": 26,
           "type": "lineHeights"
         },
-        "body": {
-          "value": 26,
-          "type": "lineHeights"
-        },
-        "bodySmall": {
+        "body2": {
           "value": 22,
           "type": "lineHeights"
         },
-        "meta": {
+        "caption": {
           "value": 18,
           "type": "lineHeights"
         }

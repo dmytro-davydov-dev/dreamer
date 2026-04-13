@@ -64,7 +64,6 @@ async function mkText(parent, x, y, content, size, color, name, bold, opacity) {
 
 // ─── PAGE 1: Cover & Principles ─────────────────────────────────────────────
 async function buildCover(page) {
-  figma.currentPage = page;
   const f = mkFrame(page, 0, 0, 800, 640, '01 -- Cover', T.bgPrimary);
   mkRect(f, 0, 0, 800, 4, T.accent);
   await mkText(f, 48, 60,  'Dreamer', 56, T.accent, 'Product Name', true);
@@ -86,7 +85,6 @@ async function buildCover(page) {
 
 // ─── PAGE 2: Foundations & Components ───────────────────────────────────────
 async function buildFoundations(page) {
-  figma.currentPage = page;
   let yOff = 0;
 
   async function sHead(label) {
@@ -282,7 +280,6 @@ async function buildFoundations(page) {
 
 // ─── PAGE 3: Screens — Core Flow ─────────────────────────────────────────────
 async function buildScreens(page) {
-  figma.currentPage = page;
   const SW = 390, SH = 844, GAP = 60;
 
   async function makeScreen(idx, name) {
@@ -447,55 +444,29 @@ async function buildScreens(page) {
   }
 }
 
-// ─── MAIN ─────────────────────────────────────────────────────────────────
+// ─── MAIN — page-aware (run from each page) ───────────────────────────────
 async function main() {
-  const pages = figma.root.children;
-  const names = pages.map(p => p.id + ':' + p.name.substring(0,12)).join(' | ');
-  figma.notify('Pages(' + pages.length + '): ' + names.substring(0, 80));
-
-  await new Promise(r => setTimeout(r, 3000)); // pause to read notification
-
-  const page1 = pages[0];
-  const page2 = pages[1];
-  const page3 = pages[2];
+  const page = figma.currentPage;
+  const name = page.name.toLowerCase();
+  figma.notify('Running on: ' + page.name.substring(0, 40));
 
   try {
-    if (page1) {
-      figma.notify('Building Cover on: ' + page1.name.substring(0, 30));
-      await new Promise(r => setTimeout(r, 1000));
-      await buildCover(page1);
-      figma.notify('Cover done!');
-    }
-  } catch(e) {
-    figma.notify('Cover error: ' + e.message, { error: true });
-    console.error('Cover error:', e);
-  }
-
-  try {
-    if (page2) {
-      figma.notify('Building Foundations on: ' + page2.name.substring(0, 30));
-      await new Promise(r => setTimeout(r, 1000));
-      await buildFoundations(page2);
-      figma.notify('Foundations done!');
-    }
-  } catch(e) {
-    figma.notify('Foundations error: ' + e.message, { error: true });
-    console.error('Foundations error:', e);
-  }
-
-  try {
-    if (page3) {
-      figma.notify('Building Screens on: ' + page3.name.substring(0, 30));
-      await new Promise(r => setTimeout(r, 1000));
-      await buildScreens(page3);
+    if (name.includes('01') || name.includes('cover') || name.includes('principle')) {
+      await buildCover(page);
+      figma.notify('Cover & Principles done!');
+    } else if (name.includes('02') || name.includes('found') || name.includes('component')) {
+      await buildFoundations(page);
+      figma.notify('Foundations & Components done!');
+    } else if (name.includes('03') || name.includes('screen')) {
+      await buildScreens(page);
       figma.notify('Screens done!');
+    } else {
+      figma.notify('Unknown page: ' + page.name.substring(0, 40));
     }
   } catch(e) {
-    figma.notify('Screens error: ' + e.message, { error: true });
-    console.error('Screens error:', e);
+    figma.notify('Error: ' + e.message, { error: true });
+    console.error(e);
   }
-
-  figma.notify('Dreamer design system generated!');
   figma.closePlugin();
 }
 
