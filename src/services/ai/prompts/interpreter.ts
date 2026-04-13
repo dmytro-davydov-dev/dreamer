@@ -22,8 +22,12 @@ CRITICAL RULES:
    - Avoid clinical terminology
 
 4. Ground each hypothesis in evidence:
-   - Reference specific dream elements or user associations by label or quote
+  - Reference specific dream elements or user associations by id
    - Connect the hypothesis to the dream content, not general psychology
+  - Every evidence item must include: type, refId, quote
+  - For type="element", refId must be one of the provided element IDs
+  - For type="association", refId must be one of the provided association IDs
+  - For type="dream_text", refId must be exactly "dream_text"
 
 5. Include a reflective question per hypothesis:
    - A genuine, open-ended question that invites personal exploration
@@ -37,8 +41,10 @@ Remember: These are hypotheses to explore, not conclusions about the dreamer's p
 
 export function buildInterpreterUserPrompt(args: {
   rawText: string;
-  elements: Array<{ kind: string; label: string; evidence?: string[] }>;
+  elements: Array<{ id: string; kind: string; label: string; evidence?: string[] }>;
   associations: Array<{
+    id: string;
+    elementId: string;
     elementLabel: string;
     associationText: string;
     emotionalValence: string;
@@ -51,7 +57,7 @@ export function buildInterpreterUserPrompt(args: {
 
   prompt += `# Extracted Elements\n\n`;
   elements.forEach((el) => {
-    prompt += `- **${el.label}** (${el.kind})`;
+    prompt += `- [elementId:${el.id}] **${el.label}** (${el.kind})`;
     if (el.evidence && el.evidence.length > 0) {
       prompt += `\n  Evidence: ${el.evidence.join("; ")}`;
     }
@@ -60,7 +66,7 @@ export function buildInterpreterUserPrompt(args: {
 
   prompt += `\n# Personal Associations\n\n`;
   associations.forEach((assoc) => {
-    prompt += `- **${assoc.elementLabel}**: "${assoc.associationText}" (${assoc.emotionalValence}, salience: ${assoc.salience}/5)\n`;
+    prompt += `- [associationId:${assoc.id}] [elementId:${assoc.elementId}] **${assoc.elementLabel}**: "${assoc.associationText}" (${assoc.emotionalValence}, salience: ${assoc.salience}/5)\n`;
   });
 
   prompt += `
@@ -69,7 +75,14 @@ export function buildInterpreterUserPrompt(args: {
 Generate 2–3 Jungian hypotheses about what this dream might mean for the dreamer. 
 Use the elements and associations above as evidence.
 Frame each as a hypothesis, not a conclusion.
-Include a reflective question per hypothesis.`;
+Include a reflective question per hypothesis.
+
+Evidence object rules:
+- type must be one of: dream_text | element | association
+- refId rules:
+  - dream_text -> refId must be "dream_text"
+  - element -> refId must be one of provided element IDs
+  - association -> refId must be one of provided association IDs`;
 
   return prompt;
 }

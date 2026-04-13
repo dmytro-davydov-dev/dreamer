@@ -37,6 +37,7 @@ export const INTERPRETER_SCHEMA = {
             description: "The hypothesis framed as a possibility, not a conclusion",
             minLength: 20,
             maxLength: 500,
+            pattern: "^(Could be|One possibility is|This could suggest|The dream may point to)",
           },
           evidence: {
             type: "array",
@@ -59,6 +60,7 @@ export const INTERPRETER_SCHEMA = {
                 },
               },
               required: ["type", "refId", "quote"],
+              additionalProperties: false,
             },
             minItems: 1,
             maxItems: 3,
@@ -71,10 +73,12 @@ export const INTERPRETER_SCHEMA = {
           },
         },
         required: ["lens", "hypothesisText", "evidence", "reflectiveQuestion"],
+        additionalProperties: false,
       },
       minItems: 2,
       maxItems: 3,
     },
   },
   required: ["hypotheses"],
+  additionalProperties: false,
 } as const;

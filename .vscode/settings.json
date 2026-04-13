@@ -1,0 +1,6 @@
+{
+    "github.copilot.chat.agent.enabled": true,
+    "github.copilot.chat.workspaceEdits.enabled": true,
+    "github.copilot.chat.terminal.enabled": true,
+    "github.copilot.chat.tools.enabled": true
+}
