@@ -28,6 +28,7 @@
 | DRM-28 | Design tokens: `design-tokens.json` + `DESIGN_TOKENS.md` | `documentation/design-tokens.json`, `DESIGN_TOKENS.md` |
 | DRM-21 | Interpreter stage — hypotheses only (AI), framing + evidence ref normalization | `src/features/dreamInterpretation/service/generateHypotheses.service.ts`, `src/services/ai/prompts/interpreter.ts`, `src/services/ai/schemas/interpreter.schema.ts` |
 | DRM-13 | Interpretation screen: 2–3 expandable hypothesis cards + feedback UX | `src/features/dreamInterpretation/ui/InterpretationPage.tsx`, `src/entities/hypothesis/ui/HypothesisCard.tsx` |
+| DRM-22 | Integrator stage — reflection + small practice (AI service + guardrails + persistence) | `src/features/dreamIntegration/service/generateIntegration.service.ts`, `src/services/ai/prompts/integrator.ts`, `src/services/ai/schemas/integrator.schema.ts`, `src/features/dreamIntegration/service/generateIntegration.service.test.ts` |
 
 ---
 
@@ -37,7 +38,6 @@
 
 | Ticket | Summary | Why it matters |
 |--------|---------|----------------|
-| **DRM-22** | Integrator stage — reflection + small practice (AI) | Currently a static UI placeholder; needs AI integration |
 | **DRM-17** | Firestore security rules (per-UID isolation) | Required before any public deployment; currently no `firestore.rules` |
 | **DRM-33** | Disclaimer gating (first-use modal + persistent access) | MVP ethics requirement; must appear before first AI call |
 
@@ -81,11 +81,11 @@ Add `firestore.rules` enforcing per-UID isolation: `allow read, write: if reques
 **2. DRM-33 — Disclaimer gating**
 Implement a one-time modal on first session that explains: not therapy, not medical advice, hypotheses only, data stays local. Persist acknowledgement to localStorage. Also expose a persistent "About / Disclaimer" link in nav.
 
-**3. DRM-22 — Integrator AI stage**
-`DreamIntegrationPage` exists as a static placeholder. Wire it to an AI call that generates 2 reflective prompts tailored to the dream's hypotheses. Persist responses to Firestore.
-
-**4. DRM-15 — Dream Session View (read-only replay)**
+**3. DRM-15 — Dream Session View (read-only replay)**
 A route like `/dreams/:id/session` that renders the full session in read-only mode: dream text, elements, associations, hypotheses, integration. Needed for returning users.
+
+**4. Wire Integration page to DRM-22 service**
+`generateIntegration.service.ts` is implemented and tested, but `DreamIntegrationPage` is still mostly static. Connect the page to load context from Firestore, call the service via BYOK gating, and render generated reflective questions + suggestion from persisted `/integration/main`.
 
 ---
 
