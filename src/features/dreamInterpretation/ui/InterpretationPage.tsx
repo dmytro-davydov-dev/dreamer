@@ -69,6 +69,7 @@ export default function InterpretationPage({
   const [hypotheses, setHypotheses] = useState<Array<{ id: HypothesisId; data: HypothesisDoc }>>([]);
   const [error, setError] = useState<string>("");
   const [generateError, setGenerateError] = useState<string>("");
+  const [savingFeedbackId, setSavingFeedbackId] = useState<HypothesisId | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -142,6 +143,8 @@ export default function InterpretationPage({
   const handleFeedback = useCallback(
     async (hypothesisId: HypothesisId, feedback: HypothesisFeedback) => {
       try {
+        setError("");
+        setSavingFeedbackId(hypothesisId);
         await setHypothesisFeedback(db, uid, dreamId, hypothesisId, feedback);
 
         setHypotheses((prev) =>
@@ -154,6 +157,8 @@ export default function InterpretationPage({
       } catch (err) {
         console.error("Failed to set feedback:", err);
         setError("Could not save feedback. Please try again.");
+      } finally {
+        setSavingFeedbackId(null);
       }
     },
     [db, uid, dreamId]
@@ -300,6 +305,7 @@ export default function InterpretationPage({
                     <HypothesisCard
                       key={hyp.id}
                       hypothesis={hyp}
+                      isSavingFeedback={savingFeedbackId === hyp.id}
                       onFeedback={(id, feedback) => handleFeedback(id, feedback)}
                     />
                   ))}

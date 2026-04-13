@@ -5,18 +5,21 @@
  */
 
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Chip,
-  Divider,
-  Paper,
   Stack,
   Typography,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import { useState } from "react";
 
 import type {
   HypothesisDoc,
@@ -28,6 +31,7 @@ import type {
 interface HypothesisCardProps {
   hypothesis: { id: HypothesisId; data: HypothesisDoc };
   onFeedback?: (id: HypothesisId, feedback: HypothesisFeedback) => void;
+  isSavingFeedback?: boolean;
 }
 
 const LENS_LABELS: Record<JungianLens, string> = {
@@ -41,176 +45,199 @@ const LENS_LABELS: Record<JungianLens, string> = {
 export default function HypothesisCard({
   hypothesis,
   onFeedback,
+  isSavingFeedback = false,
 }: HypothesisCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const { id, data } = hypothesis;
   const isResonates = data.userFeedback === "resonates";
   const isDoesNotFit = data.userFeedback === "does_not_fit";
 
+  const evidenceTypeLabel: Record<string, string> = {
+    dream_text: "Dream Text",
+    element: "Element",
+    association: "Association",
+  };
+
   return (
-    <Paper
-      variant="outlined"
+    <Accordion
+      expanded={expanded}
+      onChange={(_, nextExpanded) => setExpanded(nextExpanded)}
+      disableGutters
+      elevation={0}
       sx={{
-        px: 3,
-        py: 2.5,
-        borderColor: "rgba(0, 212, 255, 0.12)",
-        backgroundColor: "rgba(15, 22, 41, 0.8)",
+        border: "1px solid var(--color-border-subtle)",
+        borderRadius: "var(--radius-card)",
+        backgroundColor: "var(--color-bg-card)",
+        overflow: "hidden",
+        "&:before": { display: "none" },
       }}
     >
-      <Stack spacing={2}>
-        {/* Lens chip */}
-        <Box>
-          <Chip
-            label={LENS_LABELS[data.lens]}
-            size="small"
-            sx={{
-              fontSize: "10px",
-              height: "18px",
-              backgroundColor: "rgba(124, 58, 237, 0.15)",
-              color: "var(--color-accent-secondary, #7c3aed)",
-              border: "1px solid rgba(124, 58, 237, 0.3)",
-              fontWeight: 500,
-            }}
-          />
-        </Box>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon sx={{ color: "var(--color-text-muted)" }} />}
+        sx={{ px: 3, py: 1.5, alignItems: "flex-start" }}
+      >
+        <Stack spacing={1.5} sx={{ width: "100%", pr: 1 }}>
+          <Box>
+            <Chip
+              label={LENS_LABELS[data.lens]}
+              size="small"
+              sx={{
+                fontSize: "10px",
+                height: "18px",
+                backgroundColor: "var(--color-accent-secondary-soft)",
+                color: "var(--color-text-primary)",
+                border: "1px solid var(--color-border-subtle)",
+                fontWeight: 500,
+              }}
+            />
+          </Box>
 
-        {/* Hypothesis text */}
-        <Typography
-          variant="body1"
-          sx={{
-            color: "var(--color-text-secondary, #94a3b8)",
-            lineHeight: 1.7,
-          }}
-        >
-          {data.hypothesisText}
-        </Typography>
-
-        {/* Disclaimer */}
-        <Typography
-          variant="caption"
-          sx={{
-            color: "var(--color-text-muted, #64748b)",
-            fontStyle: "italic",
-          }}
-        >
-          One possible interpretation — not a conclusion.
-        </Typography>
-
-        <Divider sx={{ borderColor: "rgba(0, 212, 255, 0.1)", my: 0.5 }} />
-
-        {/* Reflective question */}
-        <Box>
           <Typography
-            variant="overline"
+            variant="body1"
             sx={{
-              color: "var(--color-text-muted, #64748b)",
-              fontSize: "10px",
-              letterSpacing: "0.1em",
-              fontWeight: 600,
-              display: "block",
-              mb: 0.75,
+              color: "var(--color-text-secondary)",
+              lineHeight: 1.7,
             }}
           >
-            Reflective Question
+            {data.hypothesisText}
           </Typography>
+        </Stack>
+      </AccordionSummary>
+
+      <AccordionDetails sx={{ px: 3, pb: 2.5, pt: 0 }}>
+        <Stack spacing={2}>
           <Typography
-            variant="body2"
+            variant="caption"
             sx={{
-              color: "var(--color-text-secondary, #94a3b8)",
+              color: "var(--color-text-muted)",
               fontStyle: "italic",
             }}
           >
-            {data.reflectiveQuestion}
+            One possible interpretation, not a conclusion.
           </Typography>
-        </Box>
 
-        {/* Evidence */}
-        {data.evidence && data.evidence.length > 0 && (
           <Box>
             <Typography
-              variant="caption"
+              variant="overline"
               sx={{
-                color: "var(--color-text-muted, #64748b)",
+                color: "var(--color-text-muted)",
+                fontSize: "10px",
+                letterSpacing: "0.1em",
+                fontWeight: 600,
                 display: "block",
                 mb: 0.75,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                fontSize: "10px",
-                fontWeight: 600,
               }}
             >
-              Evidence
+              Reflective Question
             </Typography>
-            <Stack spacing={0.75}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "var(--color-text-secondary)",
+                fontStyle: "italic",
+              }}
+            >
+              {data.reflectiveQuestion}
+            </Typography>
+          </Box>
+
+          <Box>
+            <Typography
+              variant="overline"
+              sx={{
+                color: "var(--color-text-muted)",
+                fontSize: "10px",
+                letterSpacing: "0.1em",
+                fontWeight: 600,
+                display: "block",
+                mb: 1,
+              }}
+            >
+              Evidence References
+            </Typography>
+            <Stack spacing={1}>
               {data.evidence.map((ev, idx) => (
-                <Typography
-                  key={idx}
-                  variant="caption"
-                  sx={{
-                    color: "var(--color-text-muted, #64748b)",
-                    fontStyle: "italic",
-                  }}
+                <Stack
+                  key={`${ev.refId}-${idx}`}
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
                 >
-                  — {ev.quote}
-                </Typography>
+                  <Chip
+                    size="small"
+                    label={`${evidenceTypeLabel[ev.type] ?? "Evidence"} - ${ev.refId}`}
+                    sx={{
+                      height: "22px",
+                      fontSize: "11px",
+                      color: "var(--color-text-primary)",
+                      backgroundColor: "var(--color-accent-primary-soft)",
+                      border: "1px solid var(--color-border-subtle)",
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--color-text-muted)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    "{ev.quote}"
+                  </Typography>
+                </Stack>
               ))}
             </Stack>
           </Box>
-        )}
 
-        <Divider sx={{ borderColor: "rgba(0, 212, 255, 0.1)", my: 0.5 }} />
-
-        {/* Feedback buttons */}
-        <Stack direction="row" spacing={1}>
-          <Button
-            variant={isResonates ? "contained" : "outlined"}
-            size="small"
-            startIcon={
-              isResonates ? (
-                <ThumbUpIcon fontSize="small" />
-              ) : (
-                <ThumbUpOutlinedIcon fontSize="small" />
-              )
-            }
-            onClick={() =>
-              onFeedback?.(id, isResonates ? "resonates" : "resonates")
-            }
-            sx={{
-              color: isResonates ? "white" : "var(--color-text-muted, #64748b)",
-              borderColor: isResonates ? undefined : "rgba(0, 212, 255, 0.2)",
-              backgroundColor: isResonates ? "var(--color-success, #10b981)" : undefined,
-              textTransform: "none",
-              fontSize: "12px",
-              flex: 1,
-            }}
-          >
-            Resonates
-          </Button>
-          <Button
-            variant={isDoesNotFit ? "contained" : "outlined"}
-            size="small"
-            startIcon={
-              isDoesNotFit ? (
-                <ThumbDownIcon fontSize="small" />
-              ) : (
-                <ThumbDownOutlinedIcon fontSize="small" />
-              )
-            }
-            onClick={() =>
-              onFeedback?.(id, isDoesNotFit ? "does_not_fit" : "does_not_fit")
-            }
-            sx={{
-              color: isDoesNotFit ? "white" : "var(--color-text-muted, #64748b)",
-              borderColor: isDoesNotFit ? undefined : "rgba(0, 212, 255, 0.2)",
-              backgroundColor: isDoesNotFit ? "var(--color-error, #ef4444)" : undefined,
-              textTransform: "none",
-              fontSize: "12px",
-              flex: 1,
-            }}
-          >
-            Doesn't fit
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant={isResonates ? "contained" : "outlined"}
+              size="small"
+              startIcon={
+                isResonates ? (
+                  <ThumbUpIcon fontSize="small" />
+                ) : (
+                  <ThumbUpOutlinedIcon fontSize="small" />
+                )
+              }
+              onClick={() => onFeedback?.(id, "resonates")}
+              disabled={isSavingFeedback}
+              sx={{
+                color: isResonates ? "white" : "var(--color-text-muted)",
+                borderColor: isResonates ? undefined : "var(--color-border-subtle)",
+                backgroundColor: isResonates ? "var(--color-success)" : undefined,
+                textTransform: "none",
+                fontSize: "12px",
+                flex: 1,
+              }}
+            >
+              Resonates
+            </Button>
+            <Button
+              variant={isDoesNotFit ? "contained" : "outlined"}
+              size="small"
+              startIcon={
+                isDoesNotFit ? (
+                  <ThumbDownIcon fontSize="small" />
+                ) : (
+                  <ThumbDownOutlinedIcon fontSize="small" />
+                )
+              }
+              onClick={() => onFeedback?.(id, "does_not_fit")}
+              disabled={isSavingFeedback}
+              sx={{
+                color: isDoesNotFit ? "white" : "var(--color-text-muted)",
+                borderColor: isDoesNotFit ? undefined : "var(--color-border-subtle)",
+                backgroundColor: isDoesNotFit ? "var(--color-error)" : undefined,
+                textTransform: "none",
+                fontSize: "12px",
+                flex: 1,
+              }}
+            >
+              Doesn't fit
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </Paper>
+      </AccordionDetails>
+    </Accordion>
   );
 }

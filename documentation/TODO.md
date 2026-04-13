@@ -27,6 +27,7 @@
 | DRM-27 | UX_FLOW.md updated with BYOK section + status badges | `documentation/UX_FLOW.md` |
 | DRM-28 | Design tokens: `design-tokens.json` + `DESIGN_TOKENS.md` | `documentation/design-tokens.json`, `DESIGN_TOKENS.md` |
 | DRM-21 | Interpreter stage — hypotheses only (AI), framing + evidence ref normalization | `src/features/dreamInterpretation/service/generateHypotheses.service.ts`, `src/services/ai/prompts/interpreter.ts`, `src/services/ai/schemas/interpreter.schema.ts` |
+| DRM-13 | Interpretation screen: 2–3 expandable hypothesis cards + feedback UX | `src/features/dreamInterpretation/ui/InterpretationPage.tsx`, `src/entities/hypothesis/ui/HypothesisCard.tsx` |
 
 ---
 
@@ -36,7 +37,6 @@
 
 | Ticket | Summary | Why it matters |
 |--------|---------|----------------|
-| **DRM-13** | Interpretation screen: 2–3 hypothesis cards + user feedback | UI layer for DRM-21; hypothesis cards with thumbs-up/down |
 | **DRM-22** | Integrator stage — reflection + small practice (AI) | Currently a static UI placeholder; needs AI integration |
 | **DRM-17** | Firestore security rules (per-UID isolation) | Required before any public deployment; currently no `firestore.rules` |
 | **DRM-33** | Disclaimer gating (first-use modal + persistent access) | MVP ethics requirement; must appear before first AI call |
@@ -75,19 +75,16 @@
 
 Work in this order to reach a complete end-to-end MVP:
 
-**1. DRM-13 — Interpretation screen polish + feedback UX (highest impact)**
-Interpreter generation is now implemented. Next priority is completing/polishing the interpretation UI flow so users can reliably review 2–3 hypotheses and submit thumbs-up/down feedback with clear loading/error states.
-
-**2. DRM-17 — Firestore security rules**
+**1. DRM-17 — Firestore security rules**
 Add `firestore.rules` enforcing per-UID isolation: `allow read, write: if request.auth != null && request.auth.uid == resource.data.userId`. Run `firebase emulators:start` to validate before deploy.
 
-**3. DRM-33 — Disclaimer gating**
+**2. DRM-33 — Disclaimer gating**
 Implement a one-time modal on first session that explains: not therapy, not medical advice, hypotheses only, data stays local. Persist acknowledgement to localStorage. Also expose a persistent "About / Disclaimer" link in nav.
 
-**4. DRM-22 — Integrator AI stage**
+**3. DRM-22 — Integrator AI stage**
 `DreamIntegrationPage` exists as a static placeholder. Wire it to an AI call that generates 2 reflective prompts tailored to the dream's hypotheses. Persist responses to Firestore.
 
-**5. DRM-15 — Dream Session View (read-only replay)**
+**4. DRM-15 — Dream Session View (read-only replay)**
 A route like `/dreams/:id/session` that renders the full session in read-only mode: dream text, elements, associations, hypotheses, integration. Needed for returning users.
 
 ---
