@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function forbiddenKeyNames() {
+      return [
+        "apiKey",
+        "llmApiKey",
+        "openAiApiKey",
+        "openaiApiKey",
+        "byokApiKey",
+        "byokKey",
+        "secret",
+        "secretKey",
+        "accessToken",
+        "refreshToken",
+        "privateKey"
+      ];
+    }
+
+    function mapHasForbiddenKeys(data) {
+      return data is map && data.keys().hasAny(forbiddenKeyNames());
+    }
+
+    function hasNestedForbiddenKeys(data) {
+      return (data is map) && (
+        (("settings" in data) && mapHasForbiddenKeys(data.settings)) ||
+        (("byok" in data) && mapHasForbiddenKeys(data.byok)) ||
+        (("credentials" in data) && mapHasForbiddenKeys(data.credentials))
+      );
+    }
+
+    function hasNoByokKeyMaterial() {
+      return !mapHasForbiddenKeys(request.resource.data)
+        && !hasNestedForbiddenKeys(request.resource.data);
+    }
+
+    function canReadWriteUserTree(uid) {
+      return isOwner(uid) && hasNoByokKeyMaterial();
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create, update: if canReadWriteUserTree(uid);
+      allow delete: if isOwner(uid);
+    }
+
+    match /users/{uid}/{document=**} {
+      allow read: if isOwner(uid);
+      allow create, update: if canReadWriteUserTree(uid);
+      allow delete: if isOwner(uid);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
