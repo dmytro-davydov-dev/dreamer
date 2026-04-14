@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Firestore } from "firebase/firestore";
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -36,6 +37,32 @@ type DreamEntryPageProps = {
 
 const DEFAULT_AUTOSAVE_MS = 600;
 
+type SpeechRecognitionResultLike = {
+  0: { transcript: string };
+  isFinal: boolean;
+};
+
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+};
+
+type SpeechRecognitionLike = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type WindowWithSpeechRecognition = Window & {
+  SpeechRecognition?: new () => SpeechRecognitionLike;
+  webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+};
+
 export default function DreamEntryPage({
   db,
   uid,
@@ -48,9 +75,13 @@ export default function DreamEntryPage({
   const [mood, setMood] = useState("");
   const [lifeContext, setLifeContext] = useState("");
   const [draftId, setDraftId] = useState<DreamId | null>(dreamId ?? null);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [isVoiceRecording, setIsVoiceRecording] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   const createInFlightRef = useRef<Promise<DreamId> | null>(null);
   const saveTimerRef = useRef<number | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   const services = useMemo(
     () => ({
@@ -61,6 +92,16 @@ export default function DreamEntryPage({
   );
 
   const isContinueEnabled = rawText.trim().length > 0;
+
+  const getSpeechRecognitionCtor = useCallback(() => {
+    if (typeof window === "undefined") return undefined;
+    const speechWindow = window as WindowWithSpeechRecognition;
+    return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+  }, []);
+
+  useEffect(() => {
+    setVoiceSupported(Boolean(getSpeechRecognitionCtor()));
+  }, [getSpeechRecognitionCtor]);
 
   const buildCreateInput = (): CreateDreamInput | null => {
     const trimmed = rawText.trim();
@@ -143,6 +184,81 @@ export default function DreamEntryPage({
     void saveDraft();
   };
 
+  const startVoiceCapture = () => {
+    const SpeechRecognitionCtor = getSpeechRecognitionCtor();
+
+    if (!SpeechRecognitionCtor) {
+      setVoiceError("Voice capture is not supported in this browser.");
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      const recognition = new SpeechRecognitionCtor();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      recognition.onresult = (event) => {
+        const finalChunks: string[] = [];
+
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalChunks.push(result[0].transcript.trim());
+          }
+        }
+
+        if (finalChunks.length === 0) return;
+
+        const chunk = finalChunks.join(" ").trim();
+        if (!chunk) return;
+
+        setRawText((prev) => {
+          const current = prev.trim();
+          return current ? `${current} ${chunk}` : chunk;
+        });
+      };
+
+      recognition.onerror = (event) => {
+        setVoiceError(`Voice capture error: ${event.error}`);
+        setIsVoiceRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsVoiceRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    setVoiceError(null);
+
+    try {
+      recognitionRef.current.start();
+      setIsVoiceRecording(true);
+    } catch {
+      setVoiceError("Could not start voice capture. Please try again.");
+      setIsVoiceRecording(false);
+    }
+  };
+
+  const stopVoiceCapture = () => {
+    if (!recognitionRef.current) return;
+    recognitionRef.current.stop();
+    setIsVoiceRecording(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (!recognitionRef.current) return;
+      recognitionRef.current.onresult = null;
+      recognitionRef.current.onerror = null;
+      recognitionRef.current.onend = null;
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    };
+  }, []);
+
   return (
     <Box
       component="main"
@@ -191,6 +307,28 @@ export default function DreamEntryPage({
             onBlur={handleBlur}
             fullWidth
           />
+
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }}>
+            <Button
+              variant={isVoiceRecording ? "outlined" : "contained"}
+              color="primary"
+              onClick={isVoiceRecording ? stopVoiceCapture : startVoiceCapture}
+              disabled={!voiceSupported && !isVoiceRecording}
+            >
+              {isVoiceRecording ? "Stop voice capture" : "Start voice capture"}
+            </Button>
+            <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
+              {voiceSupported
+                ? "Speak naturally. Your words will be appended to the dream text."
+                : "Voice capture is unavailable in this browser. You can still type your dream."}
+            </Typography>
+          </Stack>
+
+          {voiceError && (
+            <Alert severity="warning" role="alert">
+              {voiceError}
+            </Alert>
+          )}
 
           {/* Mood */}
           <TextField
