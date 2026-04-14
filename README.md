@@ -66,17 +66,40 @@ This project is intended for personal reflection and educational exploration. It
 
 ### Main Tech Stack
 
-React + Vite + TypeScript + Material UI starter.
+React + Vite + TypeScript + Material UI. Firebase Firestore for persistence, Firebase Anonymous Auth for per-user data isolation.
 
-- Install dependencies: `yarn install`
-- Start dev server: `yarn run dev`
-- Build: `yarn run build`
-- Preview: `yarn run preview`
-- Lint: `yarn run lint`
+### Getting Started
+
+1. Install dependencies:
+   ```bash
+   yarn install
+   ```
+
+2. Set up Firebase — see **[documentation/FIREBASE_SETUP.md](documentation/FIREBASE_SETUP.md)** for full instructions. The short version:
+   - Create a Firebase project, enable Firestore and Anonymous Auth
+   - Copy `.env.example` to `.env` and fill in your Firebase credentials
+   - Run `npx firebase-tools deploy --only firestore:rules` to deploy security rules
+
+3. Start the dev server:
+   ```bash
+   yarn dev
+   ```
+
+### Available Scripts
+
+| Command | Description |
+|---|---|
+| `yarn dev` | Start dev server |
+| `yarn build` | Production build |
+| `yarn preview` | Preview production build |
+| `yarn lint` | Lint source files |
+| `yarn test` | Run unit tests |
+| `npx firebase-tools emulators:start` | Start Firebase local emulators (Firestore + Auth) |
 
 ## Documentation
 
+- [documentation/FIREBASE_SETUP.md](documentation/FIREBASE_SETUP.md)
 - [documentation/MVP.md](documentation/MVP.md)
-- [documentation/UX_FLOW.md](documentation/UX_FLOW.md)
-- [documentation/TECH_IMPLEMENTATION.md](documentation/TECH_IMPLEMENTATION.md)
 - [documentation/PROJECT_ARCHITECTURE.md](documentation/PROJECT_ARCHITECTURE.md)
+- [documentation/TECH_IMPLEMENTATION.md](documentation/TECH_IMPLEMENTATION.md)
+- [documentation/UX_FLOW.md](documentation/UX_FLOW.md)
