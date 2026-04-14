@@ -257,17 +257,20 @@ export async function listElements(
   dreamId: DreamId,
   opts?: { includeDeleted?: boolean }
 ): Promise<Array<{ id: ElementId; data: DreamElementDoc }>> {
-  const q = opts?.includeDeleted
-    ? query(elementsCol(db, uid, dreamId), orderBy("kind"), orderBy("order"))
-    : query(
-        elementsCol(db, uid, dreamId),
-        where("deleted", "in", [false, null]),
-        orderBy("kind"),
-        orderBy("order")
-      );
+  // Fetch all elements and filter/sort in memory to avoid requiring composite
+  // Firestore indexes (elements per dream are small, so this is fine for MVP).
+  const snaps = await getDocs(elementsCol(db, uid, dreamId));
+  const all = snaps.docs.map((d) => ({ id: d.id, data: d.data() }));
 
-  const snaps = await getDocs(q);
-  return snaps.docs.map((d) => ({ id: d.id, data: d.data() }));
+  const visible = opts?.includeDeleted
+    ? all
+    : all.filter((e) => !e.data.deleted);
+
+  return visible.sort((a, b) => {
+    if (a.data.kind < b.data.kind) return -1;
+    if (a.data.kind > b.data.kind) return 1;
+    return (a.data.order ?? 0) - (b.data.order ?? 0);
+  });
 }
 
 /** Upsert a single element by id (caller decides id) */
@@ -534,14 +537,16 @@ export function subscribeDreamSession(
   });
 
   const unsubElements = onSnapshot(
-    query(
-      elementsCol(db, uid, dreamId),
-      where("deleted", "in", [false, null]),
-      orderBy("kind"),
-      orderBy("order")
-    ),
+    elementsCol(db, uid, dreamId),
     (snaps) => {
-      latestElements = snaps.docs.map((d) => ({ id: d.id, data: d.data() }));
+      latestElements = snaps.docs
+        .map((d) => ({ id: d.id, data: d.data() }))
+        .filter((e) => !e.data.deleted)
+        .sort((a, b) => {
+          if (a.data.kind < b.data.kind) return -1;
+          if (a.data.kind > b.data.kind) return 1;
+          return (a.data.order ?? 0) - (b.data.order ?? 0);
+        });
       emit();
     }
   );

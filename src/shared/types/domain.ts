@@ -248,8 +248,8 @@ export const defaults = {
     rawText: params.rawText,
     dreamedAt: params.dreamedAt,
     createdAt: params.createdAt,
-    mood: params.mood,
-    lifeContext: params.lifeContext,
+    ...(params.mood !== undefined ? { mood: params.mood } : {}),
+    ...(params.lifeContext !== undefined ? { lifeContext: params.lifeContext } : {}),
     status: "draft",
   }),
 
