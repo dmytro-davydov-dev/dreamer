@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "jest",
+    "test:coverage": "jest --coverage --coverageReporters=text-summary",
     "test:rules": "firebase emulators:exec --only firestore --project demo-dreamer-rules \"jest --runInBand src/services/firestore/firestore.rules.test.ts\"",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
