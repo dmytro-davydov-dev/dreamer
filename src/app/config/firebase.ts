@@ -10,6 +10,7 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
   connectAuthEmulator,
   type Auth,
   onAuthStateChanged,
@@ -86,6 +87,12 @@ export async function signInAsGuest(): Promise<User> {
   const auth = getAuthService();
   const cred = await signInAnonymously(auth);
   return cred.user;
+}
+
+/** Sign out the current user. */
+export async function signOutUser(): Promise<void> {
+  const auth = getAuthService();
+  await firebaseSignOut(auth);
 }
 
 /**

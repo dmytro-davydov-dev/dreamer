@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router";
 import type { Firestore } from "firebase/firestore";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   AppBar,
   Box,
+  Button,
   CircularProgress,
   Divider,
   Drawer,
@@ -13,6 +15,7 @@ import {
   ListItemButton,
   ListItemText,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,7 +29,7 @@ import AssociationsPage from "../features/dreamAssociations/ui/AssociationsPage"
 import InterpretationPage from "../features/dreamInterpretation/ui/InterpretationPage";
 import SettingsPage from "../features/byok/ui/SettingsPage";
 import AboutPage from "../screens/AboutPage";
-import { ensureAnonymousAuth, getDb } from "./config/firebase";
+import { ensureAnonymousAuth, getAuthService, getDb, signOutUser } from "./config/firebase";
 import type { DreamId, UID } from "../shared/types/domain";
 
 type NavItem = {
@@ -499,6 +502,19 @@ function InterpretationRouteByParam({
 function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeDreamId, setActiveDreamId] = useState<DreamId | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null | undefined>(undefined);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuthService();
+    const unsub = onAuthStateChanged(auth, (user) => setCurrentUser(user));
+    return unsub;
+  }, []);
+
+  async function handleSignOut() {
+    await signOutUser();
+    navigate("/login");
+  }
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -571,6 +587,7 @@ function AppShell() {
             variant="h6"
             component="div"
             sx={{
+              flexGrow: 1,
               fontWeight: 700,
               letterSpacing: "0.04em",
               background: "linear-gradient(135deg, #e2e8f0 30%, #00d4ff 100%)",
@@ -581,6 +598,78 @@ function AppShell() {
           >
             Dreamer
           </Typography>
+
+          {/* User info + auth button */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            {currentUser !== undefined && (
+              <Tooltip
+                title={currentUser?.isAnonymous ? "Guest session" : (currentUser?.email ?? "")}
+                placement="bottom-end"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: currentUser?.isAnonymous
+                      ? "var(--color-text-secondary, #94a3b8)"
+                      : "var(--color-accent-primary, #00d4ff)",
+                    fontSize: "0.8rem",
+                    maxWidth: 180,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {currentUser?.isAnonymous || !currentUser
+                    ? "Anonymous"
+                    : currentUser.email}
+                </Typography>
+              </Tooltip>
+            )}
+            {currentUser !== undefined && (
+              currentUser ? (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={handleSignOut}
+                  sx={{
+                    borderColor: "rgba(0, 212, 255, 0.3)",
+                    color: "var(--color-text-secondary, #94a3b8)",
+                    textTransform: "none",
+                    fontSize: "0.8rem",
+                    px: 1.5,
+                    py: 0.5,
+                    "&:hover": {
+                      borderColor: "rgba(0, 212, 255, 0.6)",
+                      color: "var(--color-text-primary, #e2e8f0)",
+                      backgroundColor: "rgba(0, 212, 255, 0.06)",
+                    },
+                  }}
+                >
+                  Sign Out
+                </Button>
+              ) : (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => navigate("/login")}
+                  sx={{
+                    borderColor: "rgba(0, 212, 255, 0.3)",
+                    color: "var(--color-accent-primary, #00d4ff)",
+                    textTransform: "none",
+                    fontSize: "0.8rem",
+                    px: 1.5,
+                    py: 0.5,
+                    "&:hover": {
+                      borderColor: "rgba(0, 212, 255, 0.6)",
+                      backgroundColor: "rgba(0, 212, 255, 0.06)",
+                    },
+                  }}
+                >
+                  Sign In
+                </Button>
+              )
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
 
