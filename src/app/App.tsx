@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BrowserRouter, NavLink, Route, Routes, useNavigate, useParams } from "react-router";
+import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router";
 import type { Firestore } from "firebase/firestore";
 import {
   AppBar,
@@ -18,6 +18,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 
 import DashboardPage from "../screens/DashboardPage";
+import LoginPage from "../screens/LoginPage";
 import DreamEntryPage from "../features/dreamCapture/ui/DreamEntryPage";
 import DreamIntegrationPage from "../features/dreamIntegration/ui/DreamIntegrationPage";
 import DreamBreakdownPage from "../features/dreamStructuring/ui/DreamBreakdownPage";
@@ -638,7 +639,7 @@ function AppShell() {
       <Toolbar />
 
       <Routes>
-        <Route path="/" element={<AboutPage />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/dashboard" element={<DashboardPage onDreamSelect={handleDreamSelect} />} />
         <Route
           path="/dreams/new"
@@ -727,7 +728,10 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppShell />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/*" element={<AppShell />} />
+      </Routes>
     </BrowserRouter>
   );
 }

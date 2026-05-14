@@ -8,10 +8,13 @@ import {
 import {
   getAuth,
   signInAnonymously,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   connectAuthEmulator,
   type Auth,
   onAuthStateChanged,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 
 export type FirebaseServices = {
@@ -64,6 +67,25 @@ export function getDb(): Firestore {
 export function getAuthService(): Auth {
   if (!services) throw new Error("Firebase not initialized. Call initFirebase() first.");
   return services.auth;
+}
+
+/** Sign in an existing user with email + password. */
+export async function signInWithEmail(email: string, password: string): Promise<UserCredential> {
+  const auth = getAuthService();
+  return signInWithEmailAndPassword(auth, email, password);
+}
+
+/** Register a new user with email + password. */
+export async function signUpWithEmail(email: string, password: string): Promise<UserCredential> {
+  const auth = getAuthService();
+  return createUserWithEmailAndPassword(auth, email, password);
+}
+
+/** Sign in anonymously (guest mode). Returns the Firebase User. */
+export async function signInAsGuest(): Promise<User> {
+  const auth = getAuthService();
+  const cred = await signInAnonymously(auth);
+  return cred.user;
 }
 
 /**
