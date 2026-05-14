@@ -7,6 +7,7 @@ import {
   Divider,
   IconButton,
   InputAdornment,
+  LinearProgress,
   Paper,
   Stack,
   TextField,
@@ -16,12 +17,16 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import KeyIcon from "@mui/icons-material/Key";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 import {
   clearLlmApiKey,
   getLlmApiKey,
   hasLlmApiKey,
   setLlmApiKey,
+  getTrialDreamsUsed,
+  TRIAL_DREAM_LIMIT,
+  hasTrialDreamsRemaining,
 } from "../service/keyStorage.service";
 
 export default function SettingsPage() {
@@ -29,6 +34,7 @@ export default function SettingsPage() {
   const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
   const [keyIsSet, setKeyIsSet] = useState(hasLlmApiKey);
+  const [trialUsed, setTrialUsed] = useState(getTrialDreamsUsed);
 
   const handleSave = () => {
     const trimmed = keyInput.trim();
@@ -44,6 +50,7 @@ export default function SettingsPage() {
     clearLlmApiKey();
     setKeyInput("");
     setKeyIsSet(false);
+    setTrialUsed(getTrialDreamsUsed());
     setSaved(false);
   };
 
@@ -52,6 +59,9 @@ export default function SettingsPage() {
     if (!k) return null;
     return k.slice(0, 7) + "•".repeat(Math.max(0, k.length - 11)) + k.slice(-4);
   })();
+
+  const trialRemaining = hasTrialDreamsRemaining();
+  const trialProgress = Math.min((trialUsed / TRIAL_DREAM_LIMIT) * 100, 100);
 
   return (
     <Box
@@ -77,6 +87,76 @@ export default function SettingsPage() {
             </Typography>
           </Stack>
 
+          {/* Trial status — shown only when not using own key */}
+          {!keyIsSet && (
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 3,
+                borderColor: trialRemaining
+                  ? "rgba(0, 212, 255, 0.2)"
+                  : "rgba(245, 158, 11, 0.3)",
+                backgroundColor: "rgba(15, 22, 41, 0.8)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <Stack spacing={2}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <AutoAwesomeIcon
+                    sx={{
+                      color: trialRemaining ? "#00d4ff" : "#f59e0b",
+                      fontSize: 20,
+                    }}
+                  />
+                  <Typography
+                    variant="h6"
+                    component="h2"
+                    sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
+                  >
+                    Free trial
+                  </Typography>
+                </Stack>
+
+                <Stack spacing={1}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
+                    >
+                      Dreams recorded with shared key
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: trialRemaining ? "#00d4ff" : "#f59e0b",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {trialUsed} / {TRIAL_DREAM_LIMIT}
+                    </Typography>
+                  </Stack>
+                  <LinearProgress
+                    variant="determinate"
+                    value={trialProgress}
+                    color={trialRemaining ? "info" : "warning"}
+                    sx={{ borderRadius: 1, height: 6 }}
+                  />
+                </Stack>
+
+                <Typography
+                  variant="body2"
+                  sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
+                >
+                  {trialRemaining
+                    ? `You have ${TRIAL_DREAM_LIMIT - trialUsed} free dream${
+                        TRIAL_DREAM_LIMIT - trialUsed === 1 ? "" : "s"
+                      } remaining. Add your own key below for unlimited access.`
+                    : "Your free trial has ended. Add your own API key to keep recording dreams."}
+                </Typography>
+              </Stack>
+            </Paper>
+          )}
+
           {/* API Key section */}
           <Paper
             variant="outlined"
@@ -96,12 +176,12 @@ export default function SettingsPage() {
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    AI API Key
+                    Your API Key
                   </Typography>
                 </Stack>
                 <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
-                  Dreamer uses a Bring-Your-Own-Key model. Your key is stored only in
-                  this browser and is never sent to our servers.
+                  Optional — add your own OpenAI-compatible API key for unlimited access.
+                  Your key is stored only in this browser and is never sent to our servers.
                 </Typography>
               </Stack>
 

@@ -29,7 +29,7 @@ import {
   listHypotheses,
   setHypothesisFeedback,
 } from "../../../services/firestore/firestoreRepo";
-import { getLlmApiKey, hasLlmApiKey } from "../../../features/byok/service/keyStorage.service";
+import { getEffectiveLlmApiKey } from "../../../features/byok/service/keyStorage.service";
 import ByokGate from "../../../features/byok/ui/ByokGate";
 import { HypothesisCard } from "../../../entities/hypothesis/ui";
 import { generateHypotheses } from "../service/generateHypotheses.service";
@@ -105,7 +105,7 @@ export default function InterpretationPage({
   const handleGenerate = useCallback(async () => {
     if (!dream) return;
 
-    const apiKey = getLlmApiKey();
+    const apiKey = getEffectiveLlmApiKey();
     if (!apiKey) {
       setGenerateError("No API key found. Please check Settings.");
       return;
@@ -232,7 +232,7 @@ export default function InterpretationPage({
                       what doesn't.
                     </Typography>
 
-                    {hasLlmApiKey() ? (
+                    {getEffectiveLlmApiKey() ? (
                       <Stack spacing={1.5}>
                         <Button
                           variant="contained"
@@ -272,7 +272,7 @@ export default function InterpretationPage({
                     >
                       {hypotheses.length} hypotheses
                     </Typography>
-                    {hasLlmApiKey() && (
+                    {getEffectiveLlmApiKey() && (
                       <Button
                         variant="text"
                         size="small"

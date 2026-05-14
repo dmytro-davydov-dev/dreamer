@@ -43,7 +43,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ByokGate from "../../byok/ui/ByokGate";
-import { getLlmApiKey, hasLlmApiKey } from "../../byok/service/keyStorage.service";
+import {
+  getEffectiveLlmApiKey,
+  isUsingDefaultKey,
+  incrementTrialDreamsUsed,
+} from "../../byok/service/keyStorage.service";
 import { extractElements } from "../service/extractElements.service";
 import {
   getDream,
@@ -383,8 +387,13 @@ export default function DreamBreakdownPage({
   // ── Extract elements ───────────────────────────────────────────────────────
   const handleExtract = async () => {
     if (!dream) return;
-    const apiKey = getLlmApiKey();
+    const apiKey = getEffectiveLlmApiKey();
     if (!apiKey) return;
+
+    // Count this dream against the trial quota when using the default key
+    if (isUsingDefaultKey()) {
+      incrementTrialDreamsUsed();
+    }
 
     setPageStatus("extracting");
     setExtractError(null);
@@ -700,7 +709,7 @@ export default function DreamBreakdownPage({
                       interpretation.
                     </Typography>
 
-                    {hasLlmApiKey() ? (
+                    {getEffectiveLlmApiKey() ? (
                       <Stack spacing={1.5}>
                         <Button
                           variant="contained"
@@ -742,7 +751,7 @@ export default function DreamBreakdownPage({
                     >
                       {elements.filter((e) => !e.data.deleted).length} elements
                     </Typography>
-                    {hasLlmApiKey() && (
+                    {getEffectiveLlmApiKey() && (
                       <Button
                         variant="text"
                         size="small"

@@ -21,14 +21,14 @@ import {
   createDreamEntry,
   updateDreamEntry,
 } from "../service/dreamCapture.service";
-import { getLlmApiKey } from "../../byok/service/keyStorage.service";
+import { getEffectiveLlmApiKey } from "../../byok/service/keyStorage.service";
 import { transcribeAudio } from "../../../services/ai/client/whisperClient";
 
 type DreamEntryDeps = {
   createDream: typeof createDreamEntry;
   updateDream: typeof updateDreamEntry;
   transcribe?: typeof transcribeAudio;
-  getApiKey?: typeof getLlmApiKey;
+  getApiKey?: typeof getEffectiveLlmApiKey;
 };
 
 type DreamEntryPageProps = {
@@ -68,7 +68,7 @@ export default function DreamEntryPage({
       createDream: deps?.createDream ?? createDreamEntry,
       updateDream: deps?.updateDream ?? updateDreamEntry,
       transcribe: deps?.transcribe ?? transcribeAudio,
-      getApiKey: deps?.getApiKey ?? getLlmApiKey,
+      getApiKey: deps?.getApiKey ?? getEffectiveLlmApiKey,
     }),
     [deps]
   );
