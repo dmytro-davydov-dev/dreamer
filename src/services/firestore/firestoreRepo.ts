@@ -206,14 +206,21 @@ export function subscribeDreams(
   db: Firestore,
   uid: UID,
   cb: (rows: Array<{ id: DreamId; data: DreamDoc }>) => void,
-  opts?: { pageSize?: number; onlyStatus?: DreamStatus }
+  opts?: { pageSize?: number; onlyStatus?: DreamStatus; onError?: (err: Error) => void }
 ): Unsubscribe {
   const constraints: QueryConstraint[] = [orderBy("dreamedAt", "desc")];
   if (opts?.onlyStatus) constraints.unshift(where("status", "==", opts.onlyStatus));
   if (opts?.pageSize) constraints.push(limit(opts.pageSize));
 
   const q = query(dreamsCol(db, uid), ...constraints);
-  return onSnapshot(q, (snaps) => cb(snaps.docs.map((d) => ({ id: d.id, data: d.data() }))));
+  return onSnapshot(
+    q,
+    (snaps) => cb(snaps.docs.map((d) => ({ id: d.id, data: d.data() }))),
+    (err) => {
+      console.warn("[subscribeDreams] snapshot error:", err.code, err.message);
+      opts?.onError?.(err);
+    }
+  );
 }
 
 /** Delete a dream and all subcollections (safe, transactional-ish approach) */
@@ -531,10 +538,14 @@ export function subscribeDreamSession(
     });
   };
 
-  const unsubDream = onSnapshot(dreamRef(db, uid, dreamId), (s) => {
-    latestDream = s.exists() ? s.data() : null;
-    emit();
-  });
+  const onErr = (label: string) => (err: Error) =>
+    console.warn(`[subscribeDreamSession:${label}] snapshot error:`, (err as { code?: string }).code, err.message);
+
+  const unsubDream = onSnapshot(
+    dreamRef(db, uid, dreamId),
+    (s) => { latestDream = s.exists() ? s.data() : null; emit(); },
+    onErr("dream")
+  );
 
   const unsubElements = onSnapshot(
     elementsCol(db, uid, dreamId),
@@ -548,29 +559,27 @@ export function subscribeDreamSession(
           return (a.data.order ?? 0) - (b.data.order ?? 0);
         });
       emit();
-    }
+    },
+    onErr("elements")
   );
 
   const unsubAssociations = onSnapshot(
     query(associationsCol(db, uid, dreamId), orderBy("createdAt", "asc")),
-    (snaps) => {
-      latestAssociations = snaps.docs.map((d) => ({ id: d.id, data: d.data() }));
-      emit();
-    }
+    (snaps) => { latestAssociations = snaps.docs.map((d) => ({ id: d.id, data: d.data() })); emit(); },
+    onErr("associations")
   );
 
   const unsubHypotheses = onSnapshot(
     query(hypothesesCol(db, uid, dreamId), orderBy("createdAt", "asc")),
-    (snaps) => {
-      latestHypotheses = snaps.docs.map((d) => ({ id: d.id, data: d.data() }));
-      emit();
-    }
+    (snaps) => { latestHypotheses = snaps.docs.map((d) => ({ id: d.id, data: d.data() })); emit(); },
+    onErr("hypotheses")
   );
 
-  const unsubIntegration = onSnapshot(integrationMainRef(db, uid, dreamId), (s) => {
-    latestIntegration = s.exists() ? { id: "main", data: s.data() } : null;
-    emit();
-  });
+  const unsubIntegration = onSnapshot(
+    integrationMainRef(db, uid, dreamId),
+    (s) => { latestIntegration = s.exists() ? { id: "main", data: s.data() } : null; emit(); },
+    onErr("integration")
+  );
 
   return () => {
     unsubDream();

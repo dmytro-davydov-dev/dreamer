@@ -25,26 +25,49 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let active = true;
 
-    async function init() {
+    async function subscribe() {
       try {
         const user = await ensureAnonymousAuth();
+        if (!active) return;
 
         const db = getDb();
-        unsubscribe = subscribeDreams(db, user.uid, (dreamList) => {
-          setDreams(dreamList);
-          setLoading(false);
-        });
+        unsubscribe = subscribeDreams(
+          db,
+          user.uid,
+          (dreamList) => {
+            if (!active) return;
+            setDreams(dreamList);
+            setLoading(false);
+          },
+          {
+            onError: (err) => {
+              // permission-denied is a transient auth-token race on first load; retry once.
+              const code = (err as { code?: string }).code;
+              if (code === "permission-denied" && active) {
+                unsubscribe?.();
+                unsubscribe = undefined;
+                retryTimer = setTimeout(() => { void subscribe(); }, 1500);
+              } else {
+                setLoading(false);
+              }
+            },
+          }
+        );
       } catch (error) {
         console.error("Failed to initialize dashboard:", error);
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
 
-    init();
+    void subscribe();
 
     return () => {
-      if (unsubscribe) unsubscribe();
+      active = false;
+      clearTimeout(retryTimer);
+      unsubscribe?.();
     };
   }, []);
 
