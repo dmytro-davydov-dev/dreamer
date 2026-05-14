@@ -4,3 +4,9 @@ dist
 .env
 .env.local
 coverage/
+
+# Firebase
+.firebase/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
