@@ -520,7 +520,7 @@ function AppShell() {
 
   const navItems = useMemo<NavItem[]>(
     () => [
-      { label: "Dashboard", path: "/" },
+      { label: "Dashboard", path: "/dashboard" },
       { label: "Record a Dream", path: "/dreams/new" },
       {
         label: "Dream Breakdown",
@@ -638,7 +638,8 @@ function AppShell() {
       <Toolbar />
 
       <Routes>
-        <Route path="/" element={<DashboardPage onDreamSelect={handleDreamSelect} />} />
+        <Route path="/" element={<AboutPage />} />
+        <Route path="/dashboard" element={<DashboardPage onDreamSelect={handleDreamSelect} />} />
         <Route
           path="/dreams/new"
           element={<DreamEntryScreen onDreamSelect={handleDreamSelect} />}

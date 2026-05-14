@@ -1,4 +1,5 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
+import { useNavigate } from "react-router";
 
 const section = {
   mb: 4,
@@ -22,6 +23,8 @@ const accent = {
 };
 
 export default function AboutPage() {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -31,9 +34,30 @@ export default function AboutPage() {
         py: 5,
       }}
     >
-      <Typography variant="h4" sx={{ ...heading, mb: 0.5 }}>
-        About Dreamer
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
+        <Typography variant="h4" sx={heading}>
+          Dreamer
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/dashboard")}
+          sx={{
+            background: "linear-gradient(135deg, #00d4ff 0%, #0099bb 100%)",
+            color: "#080c14",
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            px: 3,
+            py: 1,
+            borderRadius: "8px",
+            textTransform: "none",
+            "&:hover": {
+              background: "linear-gradient(135deg, #33ddff 0%, #00bbdd 100%)",
+            },
+          }}
+        >
+          Start →
+        </Button>
+      </Box>
       <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)", mb: 4 }}>
         A tool for Jungian dreamwork and inner reflection
       </Typography>
