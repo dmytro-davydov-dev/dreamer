@@ -305,6 +305,8 @@ export default function InterpretationPage({
                     <HypothesisCard
                       key={hyp.id}
                       hypothesis={hyp}
+                      elements={elements}
+                      associations={associations}
                       isSavingFeedback={savingFeedbackId === hyp.id}
                       onFeedback={(id, feedback) => handleFeedback(id, feedback)}
                     />

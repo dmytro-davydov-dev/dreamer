@@ -50,6 +50,7 @@ import {
   listElements,
   upsertElement,
   softDeleteElement,
+  updateDream,
 } from "../../../services/firestore/firestoreRepo";
 import { nowTs } from "../../../services/firestore/timestamps";
 import { defaults } from "../../../shared/types/domain";
@@ -344,6 +345,10 @@ export default function DreamBreakdownPage({
   const [dream, setDream] = useState<DreamDoc | null>(null);
   const [elements, setElements] = useState<LocalElement[]>([]);
   const [extractError, setExtractError] = useState<string | null>(null);
+  const [editingDreamText, setEditingDreamText] = useState(false);
+  const [dreamTextValue, setDreamTextValue] = useState("");
+  const [savingDreamText, setSavingDreamText] = useState(false);
+  const dreamTextRef = useRef<HTMLTextAreaElement>(null);
 
   // ── Load dream + existing elements ────────────────────────────────────────
   useEffect(() => {
@@ -462,6 +467,38 @@ export default function DreamBreakdownPage({
     }
   };
 
+  // ── Dream text editing ────────────────────────────────────────────────────
+  const handleEditDreamText = () => {
+    if (!dream) return;
+    setDreamTextValue(dream.rawText);
+    setEditingDreamText(true);
+  };
+
+  useEffect(() => {
+    if (editingDreamText) dreamTextRef.current?.focus();
+  }, [editingDreamText]);
+
+  const handleSaveDreamText = async () => {
+    const trimmed = dreamTextValue.trim();
+    if (!trimmed || !dream) { setEditingDreamText(false); return; }
+    setSavingDreamText(true);
+    const prev = dream.rawText;
+    setDream((d) => d ? { ...d, rawText: trimmed } : d);
+    setEditingDreamText(false);
+    try {
+      await updateDream(db, uid, dreamId, { rawText: trimmed });
+    } catch {
+      setDream((d) => d ? { ...d, rawText: prev } : d);
+    } finally {
+      setSavingDreamText(false);
+    }
+  };
+
+  const handleCancelDreamText = () => {
+    setEditingDreamText(false);
+    setDreamTextValue("");
+  };
+
   // ── Group elements by kind ─────────────────────────────────────────────────
   const grouped = KIND_ORDER.reduce<Record<ElementKind, LocalElement[]>>(
     (acc, kind) => {
@@ -530,41 +567,109 @@ export default function DreamBreakdownPage({
 
           {pageStatus !== "loading" && pageStatus !== "error" && (
             <>
-              {/* Dream text preview */}
+              {/* Dream text preview / edit */}
               {dream && (
                 <Paper
                   variant="outlined"
                   sx={{
                     p: 2.5,
-                    borderColor: "rgba(0, 212, 255, 0.12)",
+                    borderColor: editingDreamText
+                      ? "rgba(0, 212, 255, 0.35)"
+                      : "rgba(0, 212, 255, 0.12)",
                     backgroundColor: "rgba(15, 22, 41, 0.6)",
+                    transition: "border-color 0.15s",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "var(--color-text-muted, #64748b)",
-                      display: "block",
-                      mb: 1,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                    }}
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{ mb: 1 }}
                   >
-                    Dream text
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "var(--color-text-secondary, #94a3b8)",
-                      whiteSpace: "pre-wrap",
-                      maxHeight: 120,
-                      overflow: "hidden",
-                      WebkitMaskImage:
-                        "linear-gradient(180deg, black 60%, transparent 100%)",
-                    }}
-                  >
-                    {dream.rawText}
-                  </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "var(--color-text-muted, #64748b)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      Dream text
+                    </Typography>
+                    {!editingDreamText && (
+                      <Tooltip title="Edit dream text">
+                        <IconButton
+                          size="small"
+                          onClick={handleEditDreamText}
+                          aria-label="Edit dream text"
+                          sx={{ mr: -0.5 }}
+                        >
+                          <EditIcon
+                            fontSize="small"
+                            sx={{ color: "var(--color-text-muted, #64748b)", fontSize: "16px" }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Stack>
+
+                  {editingDreamText ? (
+                    <Stack spacing={1.5}>
+                      <InputBase
+                        inputRef={dreamTextRef}
+                        multiline
+                        value={dreamTextValue}
+                        onChange={(e) => setDreamTextValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") handleCancelDreamText();
+                        }}
+                        sx={{
+                          fontSize: "14px",
+                          color: "var(--color-text-secondary, #94a3b8)",
+                          width: "100%",
+                          "& textarea": { py: 0, lineHeight: 1.6 },
+                        }}
+                      />
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="primary"
+                          onClick={handleSaveDreamText}
+                          disabled={savingDreamText || !dreamTextValue.trim()}
+                          sx={{ textTransform: "none", fontSize: "12px" }}
+                        >
+                          {savingDreamText ? "Saving…" : "Save"}
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={handleCancelDreamText}
+                          sx={{
+                            color: "var(--color-text-muted, #64748b)",
+                            textTransform: "none",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "var(--color-text-secondary, #94a3b8)",
+                        whiteSpace: "pre-wrap",
+                        maxHeight: 120,
+                        overflow: "hidden",
+                        WebkitMaskImage:
+                          "linear-gradient(180deg, black 60%, transparent 100%)",
+                      }}
+                    >
+                      {dream.rawText}
+                    </Typography>
+                  )}
                 </Paper>
               )}
 

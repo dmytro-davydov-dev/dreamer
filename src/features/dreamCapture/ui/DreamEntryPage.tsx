@@ -4,6 +4,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   Stack,
   TextField,
@@ -20,10 +21,14 @@ import {
   createDreamEntry,
   updateDreamEntry,
 } from "../service/dreamCapture.service";
+import { getLlmApiKey } from "../../byok/service/keyStorage.service";
+import { transcribeAudio } from "../../../services/ai/client/whisperClient";
 
 type DreamEntryDeps = {
   createDream: typeof createDreamEntry;
   updateDream: typeof updateDreamEntry;
+  transcribe?: typeof transcribeAudio;
+  getApiKey?: typeof getLlmApiKey;
 };
 
 type DreamEntryPageProps = {
@@ -37,32 +42,6 @@ type DreamEntryPageProps = {
 
 const DEFAULT_AUTOSAVE_MS = 600;
 
-type SpeechRecognitionResultLike = {
-  0: { transcript: string };
-  isFinal: boolean;
-};
-
-type SpeechRecognitionEventLike = {
-  resultIndex: number;
-  results: ArrayLike<SpeechRecognitionResultLike>;
-};
-
-type SpeechRecognitionLike = {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-
-type WindowWithSpeechRecognition = Window & {
-  SpeechRecognition?: new () => SpeechRecognitionLike;
-  webkitSpeechRecognition?: new () => SpeechRecognitionLike;
-};
-
 export default function DreamEntryPage({
   db,
   uid,
@@ -75,33 +54,26 @@ export default function DreamEntryPage({
   const [mood, setMood] = useState("");
   const [lifeContext, setLifeContext] = useState("");
   const [draftId, setDraftId] = useState<DreamId | null>(dreamId ?? null);
-  const [voiceSupported, setVoiceSupported] = useState(false);
   const [isVoiceRecording, setIsVoiceRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
   const createInFlightRef = useRef<Promise<DreamId> | null>(null);
   const saveTimerRef = useRef<number | null>(null);
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const services = useMemo(
     () => ({
       createDream: deps?.createDream ?? createDreamEntry,
       updateDream: deps?.updateDream ?? updateDreamEntry,
+      transcribe: deps?.transcribe ?? transcribeAudio,
+      getApiKey: deps?.getApiKey ?? getLlmApiKey,
     }),
     [deps]
   );
 
   const isContinueEnabled = rawText.trim().length > 0;
-
-  const getSpeechRecognitionCtor = useCallback(() => {
-    if (typeof window === "undefined") return undefined;
-    const speechWindow = window as WindowWithSpeechRecognition;
-    return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-  }, []);
-
-  useEffect(() => {
-    setVoiceSupported(Boolean(getSpeechRecognitionCtor()));
-  }, [getSpeechRecognitionCtor]);
 
   const buildCreateInput = (): CreateDreamInput | null => {
     const trimmed = rawText.trim();
@@ -184,80 +156,90 @@ export default function DreamEntryPage({
     void saveDraft();
   };
 
-  const startVoiceCapture = () => {
-    const SpeechRecognitionCtor = getSpeechRecognitionCtor();
+  const startVoiceCapture = async () => {
+    setVoiceError(null);
 
-    if (!SpeechRecognitionCtor) {
-      setVoiceError("Voice capture is not supported in this browser.");
+    const apiKey = services.getApiKey();
+    if (!apiKey) {
+      setVoiceError("No API key found. Please add your OpenAI key in Settings.");
       return;
     }
 
-    if (!recognitionRef.current) {
-      const recognition = new SpeechRecognitionCtor();
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = "en-US";
-
-      recognition.onresult = (event) => {
-        const finalChunks: string[] = [];
-
-        for (let i = event.resultIndex; i < event.results.length; i += 1) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            finalChunks.push(result[0].transcript.trim());
-          }
-        }
-
-        if (finalChunks.length === 0) return;
-
-        const chunk = finalChunks.join(" ").trim();
-        if (!chunk) return;
-
-        setRawText((prev) => {
-          const current = prev.trim();
-          return current ? `${current} ${chunk}` : chunk;
-        });
-      };
-
-      recognition.onerror = (event) => {
-        setVoiceError(`Voice capture error: ${event.error}`);
-        setIsVoiceRecording(false);
-      };
-
-      recognition.onend = () => {
-        setIsVoiceRecording(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-
-    setVoiceError(null);
-
+    let stream: MediaStream;
     try {
-      recognitionRef.current.start();
-      setIsVoiceRecording(true);
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch {
-      setVoiceError("Could not start voice capture. Please try again.");
-      setIsVoiceRecording(false);
+      setVoiceError("Microphone access denied. Please allow microphone and try again.");
+      return;
     }
+
+    audioChunksRef.current = [];
+
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+      ? "audio/webm;codecs=opus"
+      : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "";
+
+    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop());
+
+      const audioBlob = new Blob(audioChunksRef.current, {
+        type: recorder.mimeType || "audio/webm",
+      });
+
+      setIsTranscribing(true);
+      try {
+        const key = services.getApiKey();
+        if (!key) throw new Error("API key disappeared before transcription.");
+
+        const transcript = await services.transcribe({ apiKey: key, audioBlob, language: "uk" });
+        if (transcript) {
+          setRawText((prev) => {
+            const current = prev.trim();
+            return current ? `${current} ${transcript}` : transcript;
+          });
+        }
+      } catch (err) {
+        setVoiceError(err instanceof Error ? err.message : "Transcription failed.");
+      } finally {
+        setIsTranscribing(false);
+      }
+    };
+
+    mediaRecorderRef.current = recorder;
+    recorder.start();
+    setIsVoiceRecording(true);
   };
 
   const stopVoiceCapture = () => {
-    if (!recognitionRef.current) return;
-    recognitionRef.current.stop();
+    if (!mediaRecorderRef.current) return;
+    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current = null;
     setIsVoiceRecording(false);
   };
 
   useEffect(() => {
     return () => {
-      if (!recognitionRef.current) return;
-      recognitionRef.current.onresult = null;
-      recognitionRef.current.onerror = null;
-      recognitionRef.current.onend = null;
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
     };
   }, []);
+
+  const voiceButtonLabel = isTranscribing
+    ? "Transcribing…"
+    : isVoiceRecording
+      ? "Stop recording"
+      : "Start voice recording";
+
+  const voiceButtonDisabled = isTranscribing;
 
   return (
     <Box
@@ -311,16 +293,19 @@ export default function DreamEntryPage({
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }}>
             <Button
               variant={isVoiceRecording ? "outlined" : "contained"}
-              color="primary"
-              onClick={isVoiceRecording ? stopVoiceCapture : startVoiceCapture}
-              disabled={!voiceSupported && !isVoiceRecording}
+              color={isVoiceRecording ? "error" : "primary"}
+              onClick={isVoiceRecording ? stopVoiceCapture : () => void startVoiceCapture()}
+              disabled={voiceButtonDisabled}
+              startIcon={isTranscribing ? <CircularProgress size={16} color="inherit" /> : undefined}
             >
-              {isVoiceRecording ? "Stop voice capture" : "Start voice capture"}
+              {voiceButtonLabel}
             </Button>
             <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
-              {voiceSupported
-                ? "Speak naturally. Your words will be appended to the dream text."
-                : "Voice capture is unavailable in this browser. You can still type your dream."}
+              {isVoiceRecording
+                ? "Записую… Натисніть «Stop recording» коли закінчите."
+                : isTranscribing
+                  ? "Розпізнаю мову через Whisper…"
+                  : "Говоріть українською — Whisper розпізнає і додасть текст."}
             </Typography>
           </Stack>
 

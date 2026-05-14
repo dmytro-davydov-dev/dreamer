@@ -265,8 +265,8 @@ export const defaults = {
     label: params.label,
     createdAt: params.createdAt,
     source: params.source,
-    order: params.order,
-    evidence: params.evidence,
+    ...(params.order !== undefined ? { order: params.order } : {}),
+    ...(params.evidence !== undefined ? { evidence: params.evidence } : {}),
     deleted: false,
   }),
 } as const;

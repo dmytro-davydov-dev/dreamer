@@ -24,6 +24,7 @@ import DreamBreakdownPage from "../features/dreamStructuring/ui/DreamBreakdownPa
 import AssociationsPage from "../features/dreamAssociations/ui/AssociationsPage";
 import InterpretationPage from "../features/dreamInterpretation/ui/InterpretationPage";
 import SettingsPage from "../features/byok/ui/SettingsPage";
+import AboutPage from "../screens/AboutPage";
 import { ensureAnonymousAuth, getDb } from "./config/firebase";
 import type { DreamId, UID } from "../shared/types/domain";
 
@@ -532,6 +533,7 @@ function AppShell() {
         path: activeDreamId ? `/dreams/${activeDreamId}/integration` : "/dreams/integration",
       },
       { label: "Settings", path: "/settings" },
+      { label: "About", path: "/about" },
     ],
     [activeDreamId]
   );
@@ -715,6 +717,7 @@ function AppShell() {
           element={<DreamIntegrationRoute onDreamSelect={handleDreamSelect} />}
         />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/about" element={<AboutPage />} />
       </Routes>
     </Box>
   );

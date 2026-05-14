@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Firestore } from "firebase/firestore";
 import type { ComponentProps } from "react";
@@ -6,52 +6,53 @@ import type { ComponentProps } from "react";
 import DreamEntryPage from "./DreamEntryPage";
 import type { DreamId } from "../../../shared/types/domain";
 
-type MockSpeechResult = {
-  0: { transcript: string };
-  isFinal: boolean;
-};
+// ---------------------------------------------------------------------------
+// MediaRecorder stub
+// ---------------------------------------------------------------------------
+class MockMediaRecorder {
+  static instances: MockMediaRecorder[] = [];
 
-class MockSpeechRecognition {
-  static instances: MockSpeechRecognition[] = [];
+  mimeType = "audio/webm";
+  ondataavailable: ((e: { data: Blob }) => void) | null = null;
+  onstop: (() => void) | null = null;
+  state: "inactive" | "recording" = "inactive";
 
-  continuous = false;
-  interimResults = false;
-  lang = "";
-  onresult: ((event: { resultIndex: number; results: ArrayLike<MockSpeechResult> }) => void) | null = null;
-  onerror: ((event: { error: string }) => void) | null = null;
-  onend: (() => void) | null = null;
-  started = false;
-
-  constructor() {
-    MockSpeechRecognition.instances.push(this);
+  constructor(_stream: MediaStream, _options?: MediaRecorderOptions) {
+    MockMediaRecorder.instances.push(this);
   }
 
   start() {
-    this.started = true;
+    this.state = "recording";
+  }
+
+  /** Simulate user finishing recording: emit a chunk then fire onstop. */
+  simulateStop(chunk = new Blob(["audio"], { type: "audio/webm" })) {
+    if (this.ondataavailable) this.ondataavailable({ data: chunk });
+    this.state = "inactive";
+    if (this.onstop) this.onstop();
   }
 
   stop() {
-    this.started = false;
-    if (this.onend) this.onend();
+    this.simulateStop();
   }
 
-  emitFinalTranscript(transcript: string) {
-    if (!this.onresult) return;
-    this.onresult({
-      resultIndex: 0,
-      results: [
-        {
-          0: { transcript },
-          isFinal: true,
-        },
-      ],
-    });
+  static isTypeSupported(_mime: string) {
+    return true;
   }
 }
+
+// ---------------------------------------------------------------------------
+// getUserMedia stub
+// ---------------------------------------------------------------------------
+const mockStream = {
+  getTracks: () => [{ stop: jest.fn() }],
+} as unknown as MediaStream;
 
 const setup = (overrides?: Partial<ComponentProps<typeof DreamEntryPage>>) => {
   const createDream = jest.fn(async () => ({ dreamId: "dream-1" as DreamId }));
   const updateDream = jest.fn(async () => undefined);
+  const transcribe = jest.fn(async () => "Потім я побачив яскраві двері.");
+  const getApiKey = jest.fn(() => "sk-test-key");
   const db = {} as Firestore;
   const uid = "user-1";
 
@@ -62,7 +63,7 @@ const setup = (overrides?: Partial<ComponentProps<typeof DreamEntryPage>>) => {
       db={db}
       uid={uid}
       autosaveDelayMs={400}
-      deps={{ createDream, updateDream }}
+      deps={{ createDream, updateDream, transcribe, getApiKey }}
       {...overrides}
     />
   );
@@ -75,6 +76,8 @@ const setup = (overrides?: Partial<ComponentProps<typeof DreamEntryPage>>) => {
   return {
     createDream,
     updateDream,
+    transcribe,
+    getApiKey,
     db,
     uid,
     user,
@@ -91,11 +94,18 @@ const waitForAutosave = async () => {
   });
 };
 
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 describe("DreamEntryPage", () => {
   beforeEach(() => {
-    MockSpeechRecognition.instances = [];
-    delete (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition;
-    delete (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
+    MockMediaRecorder.instances = [];
+    // @ts-expect-error – stub global
+    global.MediaRecorder = MockMediaRecorder;
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: jest.fn(async () => mockStream) },
+    });
   });
 
   it("disables Continue until dream text is non-empty", async () => {
@@ -153,33 +163,66 @@ describe("DreamEntryPage", () => {
     expect(createDream).toHaveBeenCalled();
   });
 
-  it("shows voice unavailable hint when browser speech recognition is missing", () => {
-    setup();
-
-    expect(
-      screen.getByText(/voice capture is unavailable in this browser/i)
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /start voice capture/i })).toBeDisabled();
-  });
-
-  it("captures voice transcript and appends it to dream text", async () => {
-    (window as unknown as { SpeechRecognition: typeof MockSpeechRecognition }).SpeechRecognition =
-      MockSpeechRecognition;
-
-    const { user, dreamText } = setup();
-
-    await user.type(dreamText, "I was walking through a forest.");
-    await user.click(screen.getByRole("button", { name: /start voice capture/i }));
-
-    expect(MockSpeechRecognition.instances).toHaveLength(1);
-    await act(async () => {
-      MockSpeechRecognition.instances[0].emitFinalTranscript("Then I saw a bright door.");
+  it("shows an error if no API key is configured", async () => {
+    const getApiKey = jest.fn(() => null);
+    const { user } = setup({
+      deps: {
+        createDream: jest.fn(async () => ({ dreamId: "d" as DreamId })),
+        updateDream: jest.fn(async () => undefined),
+        transcribe: jest.fn(async () => ""),
+        getApiKey,
+      },
     });
 
-    expect(dreamText.value).toMatch(/I was walking through a forest\. Then I saw a bright door\./i);
-    expect(screen.getByRole("button", { name: /stop voice capture/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /start voice recording/i }));
 
-    await user.click(screen.getByRole("button", { name: /stop voice capture/i }));
-    expect(screen.getByRole("button", { name: /start voice capture/i })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(/no api key/i);
+  });
+
+  it("records audio and appends Whisper transcript to dream text", async () => {
+    const { user, dreamText, transcribe } = setup();
+
+    await user.type(dreamText, "Я йшов через ліс.");
+
+    // Start recording
+    await user.click(screen.getByRole("button", { name: /start voice recording/i }));
+
+    expect(MockMediaRecorder.instances).toHaveLength(1);
+    expect(screen.getByRole("button", { name: /stop recording/i })).toBeInTheDocument();
+
+    // Stop recording — triggers onstop → transcribe → appends text
+    MockMediaRecorder.instances[0].simulateStop();
+
+    await waitFor(() => {
+      expect(transcribe).toHaveBeenCalledWith(
+        expect.objectContaining({ apiKey: "sk-test-key", language: "uk" })
+      );
+    });
+
+    await waitFor(() => {
+      expect(dreamText.value).toMatch(/Я йшов через ліс\. Потім я побачив яскраві двері\./);
+    });
+  });
+
+  it("shows an error alert when transcription fails", async () => {
+    const transcribe = jest.fn(async () => {
+      throw new Error("Whisper API error 500");
+    });
+    const { user } = setup({
+      deps: {
+        createDream: jest.fn(async () => ({ dreamId: "d" as DreamId })),
+        updateDream: jest.fn(async () => undefined),
+        transcribe,
+        getApiKey: jest.fn(() => "sk-test-key"),
+      },
+    });
+
+    await user.click(screen.getByRole("button", { name: /start voice recording/i }));
+
+    MockMediaRecorder.instances[0].simulateStop();
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(/whisper api error 500/i);
+    });
   });
 });

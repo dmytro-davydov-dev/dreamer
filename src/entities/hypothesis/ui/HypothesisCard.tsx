@@ -22,6 +22,10 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import { useState } from "react";
 
 import type {
+  AssociationDoc,
+  AssociationId,
+  DreamElementDoc,
+  ElementId,
   HypothesisDoc,
   HypothesisFeedback,
   HypothesisId,
@@ -30,6 +34,8 @@ import type {
 
 interface HypothesisCardProps {
   hypothesis: { id: HypothesisId; data: HypothesisDoc };
+  elements?: Array<{ id: ElementId; data: DreamElementDoc }>;
+  associations?: Array<{ id: AssociationId; data: AssociationDoc }>;
   onFeedback?: (id: HypothesisId, feedback: HypothesisFeedback) => void;
   isSavingFeedback?: boolean;
 }
@@ -44,6 +50,8 @@ const LENS_LABELS: Record<JungianLens, string> = {
 
 export default function HypothesisCard({
   hypothesis,
+  elements = [],
+  associations = [],
   onFeedback,
   isSavingFeedback = false,
 }: HypothesisCardProps) {
@@ -56,6 +64,22 @@ export default function HypothesisCard({
     dream_text: "Dream Text",
     element: "Element",
     association: "Association",
+  };
+
+  const resolveRefLabel = (type: string, refId: string): string => {
+    if (type === "element") {
+      const el = elements.find((e) => e.id === refId);
+      return el?.data.label ?? refId;
+    }
+    if (type === "association") {
+      const assoc = associations.find((a) => a.id === refId);
+      if (assoc) {
+        const el = elements.find((e) => e.id === assoc.data.elementId);
+        return el?.data.label ?? refId;
+      }
+      return refId;
+    }
+    return refId;
   };
 
   return (
@@ -165,7 +189,7 @@ export default function HypothesisCard({
                 >
                   <Chip
                     size="small"
-                    label={`${evidenceTypeLabel[ev.type] ?? "Evidence"} - ${ev.refId}`}
+                    label={`${evidenceTypeLabel[ev.type] ?? "Evidence"} - ${resolveRefLabel(ev.type, ev.refId)}`}
                     sx={{
                       height: "22px",
                       fontSize: "11px",

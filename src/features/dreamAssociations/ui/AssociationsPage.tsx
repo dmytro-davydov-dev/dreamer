@@ -100,7 +100,7 @@ export default function AssociationsPage({
   onContinue,
 }: AssociationsPageProps) {
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
-  const [symbols, setSymbols] = useState<Array<{ id: ElementId; data: DreamElementDoc }>>([]);
+  const [elements, setElements] = useState<Array<{ id: ElementId; data: DreamElementDoc }>>([]);
   const [associationMap, setAssociationMap] = useState<LocalAssociationMap>({});
   const [error, setError] = useState<string>("");
   const [savingId, setSavingId] = useState<ElementId | null>(null);
@@ -132,10 +132,8 @@ export default function AssociationsPage({
         }
 
 
-        const symbolElements = elements.filter(
-          (el) => el.data.kind === "symbol" && !el.data.deleted
-        );
-        setSymbols(symbolElements);
+        const activeElements = elements.filter((el) => !el.data.deleted);
+        setElements(activeElements);
 
         const assocMap: LocalAssociationMap = {};
         associations.forEach((assoc) => {
@@ -144,8 +142,8 @@ export default function AssociationsPage({
         setAssociationMap(assocMap);
 
         const initForm: typeof formState = {};
-        symbolElements.forEach((sym) => {
-          initForm[sym.id] = {
+        activeElements.forEach((el) => {
+          initForm[el.id] = {
             text: "",
             valence: "mixed",
             salience: 3,
@@ -286,7 +284,7 @@ export default function AssociationsPage({
               variant="body1"
               sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 560 }}
             >
-              Each symbol carries personal meaning. What do these elements mean to
+              Each element carries personal meaning. What do these elements mean to
               you? Capture your associations, emotional tone, and how much each one
               resonates.
             </Typography>
@@ -308,16 +306,16 @@ export default function AssociationsPage({
 
           {pageStatus === "ready" && (
             <>
-              {symbols.length === 0 && (
+              {elements.length === 0 && (
                 <Alert severity="info">
-                  No symbols found in your dream. Return to Dream Breakdown and ensure
-                  symbols are extracted before continuing.
+                  No elements found in your dream. Return to Dream Breakdown and ensure
+                  elements are extracted before continuing.
                 </Alert>
               )}
 
-              {symbols.length > 0 && (
+              {elements.length > 0 && (
                 <Stack spacing={4}>
-                  {symbols.map((symbol) => {
+                  {elements.map((symbol) => {
                     const assoc = associationMap[symbol.id];
                     const form = formState[symbol.id];
                     const isSaving = savingId === symbol.id;
@@ -451,7 +449,7 @@ export default function AssociationsPage({
                 </Stack>
               )}
 
-              {symbols.length > 0 && (
+              {elements.length > 0 && (
                 <>
                   <Divider sx={{ borderColor: "rgba(0, 212, 255, 0.12)" }} />
                   <Stack
