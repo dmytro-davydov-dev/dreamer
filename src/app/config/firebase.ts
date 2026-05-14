@@ -73,10 +73,10 @@ export function getAuthService(): Auth {
 export async function ensureAnonymousAuth(): Promise<User> {
   const auth = getAuthService();
 
-  const existing = auth.currentUser;
-  if (existing) return existing;
-
-  // Wait for auth init; then sign in if needed.
+  // Always wait for onAuthStateChanged — it fires only after the SDK has fully
+  // initialized auth state (including token refresh). Returning auth.currentUser
+  // early can hand back a user whose token hasn't been refreshed yet, causing
+  // a transient permission-denied on the first Firestore snapshot.
   const user = await new Promise<User>((resolve, reject) => {
     const unsub = onAuthStateChanged(
       auth,
