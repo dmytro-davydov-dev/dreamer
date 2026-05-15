@@ -14,7 +14,8 @@ module.exports = {
   setupFiles: ["<rootDir>/jest.setup.cjs"],
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   moduleNameMapper: {
-    "\\.(css|less|scss)$": "identity-obj-proxy"
+    "\\.(css|less|scss)$": "identity-obj-proxy",
+    ".*services/analytics.*": "<rootDir>/src/services/analytics/__mocks__/index.ts"
   },
   transform: {
     "^.+\\.(ts|tsx)$": [

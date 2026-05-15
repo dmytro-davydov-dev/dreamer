@@ -11,7 +11,8 @@
 import type { Firestore } from "firebase/firestore";
 import { doc, collection } from "firebase/firestore";
 
-import { callLlm, type LlmCallOptions } from "../../../services/ai/client/llmClient";
+import { callLlm, LlmError, type LlmCallOptions } from "../../../services/ai/client/llmClient";
+import { analytics, startAiTimer } from "../../../services/analytics";
 import {
   EXTRACTOR_SYSTEM_PROMPT,
   buildExtractorUserPrompt,
@@ -70,7 +71,26 @@ export async function extractElements(
     maxTokens: 1024,
   };
 
-  const response = await callLlm<ExtractorResponse>(llmOptions);
+  const timer = startAiTimer();
+  let response: ExtractorResponse;
+  try {
+    response = await callLlm<ExtractorResponse>(llmOptions);
+    analytics.capture("ai_stage_completed", {
+      stage: "extract",
+      latencyMs: timer.stop(),
+      promptTokens: 0,
+      completionTokens: 0,
+      model: llmOptions.model ?? "gpt-4o-mini",
+      success: true,
+    });
+  } catch (err) {
+    analytics.capture("ai_stage_failed", {
+      stage: "extract",
+      errorKind: err instanceof LlmError ? err.kind : "api_error",
+      latencyMs: timer.stop(),
+    });
+    throw err;
+  }
 
   if (!response.elements || !Array.isArray(response.elements)) {
     throw new Error("Extractor returned an unexpected response shape.");

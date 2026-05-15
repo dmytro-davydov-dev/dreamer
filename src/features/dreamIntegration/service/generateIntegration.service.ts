@@ -6,7 +6,8 @@
 
 import type { Firestore } from "firebase/firestore";
 
-import { callLlm, type LlmCallOptions } from "../../../services/ai/client/llmClient";
+import { callLlm, LlmError, type LlmCallOptions } from "../../../services/ai/client/llmClient";
+import { analytics, startAiTimer } from "../../../services/analytics";
 import {
   INTEGRATOR_SYSTEM_PROMPT,
   buildIntegratorUserPrompt,
@@ -154,7 +155,26 @@ export async function generateIntegration(
     maxTokens: 1024,
   };
 
-  const response = await callLlm<IntegratorOutput>(llmOptions);
+  const timer = startAiTimer();
+  let response: IntegratorOutput;
+  try {
+    response = await callLlm<IntegratorOutput>(llmOptions);
+    analytics.capture("ai_stage_completed", {
+      stage: "integrate",
+      latencyMs: timer.stop(),
+      promptTokens: 0,
+      completionTokens: 0,
+      model: llmOptions.model ?? "gpt-4o-mini",
+      success: true,
+    });
+  } catch (err) {
+    analytics.capture("ai_stage_failed", {
+      stage: "integrate",
+      errorKind: err instanceof LlmError ? err.kind : "api_error",
+      latencyMs: timer.stop(),
+    });
+    throw err;
+  }
 
   if (!response.reflectiveQuestions || !Array.isArray(response.reflectiveQuestions)) {
     throw new Error("Integrator returned an unexpected response shape.");
