@@ -4,7 +4,7 @@ import App from "./app/App";
 import "./app/styles/base.css";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { initFirebase, ensureAnonymousAuth } from "./app/config/firebase";
-import { initSentry, initAnalytics } from "./services/analytics";
+import { initSentry, initAnalytics, analytics, identifyUser } from "./services/analytics";
 
 import "./app/styles/tokens.css";
 
@@ -232,7 +232,18 @@ const theme = createTheme({
 initSentry();
 initAnalytics();
 initFirebase();
-ensureAnonymousAuth();
+ensureAnonymousAuth().then((user) => {
+  const SEEN_KEY = "dreamer:user_seen";
+  if (!localStorage.getItem(SEEN_KEY)) {
+    localStorage.setItem(SEEN_KEY, "1");
+    analytics.capture("user_created", { authMethod: "anonymous" });
+  }
+  identifyUser(user.uid, {
+    plan: "byok",
+    totalDreams: 0,
+    signupDate: user.metadata.creationTime ?? new Date().toISOString(),
+  });
+}).catch(() => { /* auth errors are captured by Sentry */ });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
