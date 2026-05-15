@@ -34,6 +34,7 @@ import ByokGate from "../../../features/byok/ui/ByokGate";
 import { HypothesisCard } from "../../../entities/hypothesis/ui";
 import { generateHypotheses } from "../service/generateHypotheses.service";
 import { LlmError } from "../../../services/ai/client/llmClient";
+import { analytics } from "../../../services/analytics";
 import type {
   AssociationDoc,
   AssociationId,
@@ -113,6 +114,10 @@ export default function InterpretationPage({
 
     setPageStatus("generating");
     setGenerateError("");
+    analytics.capture("interpretation_triggered", {
+      associationCount: associations.length,
+      elementCount: elements.length,
+    });
 
     try {
       const result = await generateHypotheses({
@@ -147,6 +152,16 @@ export default function InterpretationPage({
         setSavingFeedbackId(hypothesisId);
         await setHypothesisFeedback(db, uid, dreamId, hypothesisId, feedback);
 
+        const hypothesisIndex = hypotheses.findIndex((h) => h.id === hypothesisId);
+        const hypothesis = hypotheses.find((h) => h.id === hypothesisId);
+        if (hypothesis) {
+          analytics.capture("hypothesis_feedback_given", {
+            lens: hypothesis.data.lens,
+            feedback,
+            hypothesisIndex: Math.max(0, hypothesisIndex),
+          });
+        }
+
         setHypotheses((prev) =>
           prev.map((h) =>
             h.id === hypothesisId
@@ -161,7 +176,7 @@ export default function InterpretationPage({
         setSavingFeedbackId(null);
       }
     },
-    [db, uid, dreamId]
+    [db, uid, dreamId, hypotheses]
   );
 
   return (

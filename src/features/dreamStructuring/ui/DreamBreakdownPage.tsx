@@ -67,6 +67,7 @@ import type {
   UID,
 } from "../../../shared/types/domain";
 import { LlmError } from "../../../services/ai/client/llmClient";
+import { analytics } from "../../../services/analytics";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -397,6 +398,7 @@ export default function DreamBreakdownPage({
 
     setPageStatus("extracting");
     setExtractError(null);
+    analytics.capture("structuring_triggered", { dreamId });
 
     try {
       const result = await extractElements({
@@ -436,6 +438,7 @@ export default function DreamBreakdownPage({
 
     try {
       await upsertElement(db, uid, dreamId, id, updated);
+      analytics.capture("element_edited", { elementKind: el.data.kind });
     } catch {
       // Revert on failure
       setElements((prev) =>
@@ -445,10 +448,12 @@ export default function DreamBreakdownPage({
   };
 
   const handleDelete = async (id: ElementId) => {
+    const deletedEl = elements.find((e) => e.id === id);
     setElements((prev) => prev.filter((e) => e.id !== id));
 
     try {
       await softDeleteElement(db, uid, dreamId, id);
+      if (deletedEl) analytics.capture("element_deleted", { elementKind: deletedEl.data.kind });
     } catch {
       // Revert on failure — re-load
       const reloaded = await listElements(db, uid, dreamId);
@@ -471,6 +476,7 @@ export default function DreamBreakdownPage({
 
     try {
       await upsertElement(db, uid, dreamId, id, data);
+      analytics.capture("element_added_manually", { elementKind: kind });
     } catch {
       setElements((prev) => prev.filter((e) => e.id !== id));
     }

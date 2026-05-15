@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { NavLink } from "react-router";
 import type { DreamId } from "../../../shared/types/domain";
+import { analytics } from "../../../services/analytics";
+import type { WordCountBucket } from "../../../services/analytics";
 
 type DreamIntegrationPageProps = {
   dreamId?: DreamId;
@@ -11,7 +14,30 @@ const DEFAULT_QUESTIONS = [
   "What small step could honor the feeling this dream leaves you with?",
 ];
 
+function getWordCountBucket(text: string): WordCountBucket {
+  const count = text.trim().split(/\s+/).filter(Boolean).length;
+  if (count < 50) return "<50";
+  if (count < 150) return "50-150";
+  if (count < 500) return "150-500";
+  return "500+";
+}
+
 export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPageProps) {
+  const [journalText, setJournalText] = useState("");
+
+  useEffect(() => {
+    if (dreamId) {
+      analytics.capture("integration_triggered", {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleJournalBlur = () => {
+    if (journalText.trim().length > 0) {
+      analytics.capture("journal_saved", { wordCountBucket: getWordCountBucket(journalText) });
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -192,6 +218,9 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     minRows={4}
                     placeholder="Write anything that feels worth keeping."
                     fullWidth
+                    value={journalText}
+                    onChange={(e) => setJournalText(e.target.value)}
+                    onBlur={handleJournalBlur}
                   />
                 </Stack>
               </Paper>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Box,
@@ -13,6 +13,7 @@ import DreamListItem from "../entities/dream/ui";
 import { subscribeDreams } from "../services/firestore/firestoreRepo";
 import { getDb, ensureAnonymousAuth } from "../app/config/firebase";
 import type { DreamDoc, DreamId } from "../shared/types/domain";
+import { analytics } from "../services/analytics";
 
 type DashboardPageProps = {
   onDreamSelect?: (dreamId: DreamId) => void;
@@ -22,6 +23,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
   const [dreams, setDreams] = useState<Array<{ id: DreamId; data: DreamDoc }>>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const sessionFiredRef = useRef(false);
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -70,6 +72,16 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
       unsubscribe?.();
     };
   }, []);
+
+  useEffect(() => {
+    if (!loading && !sessionFiredRef.current) {
+      sessionFiredRef.current = true;
+      analytics.capture("session_started", { sessionNumber: 1, totalDreamsOnRecord: dreams.length });
+      if (dreams.length > 0) {
+        analytics.capture("dream_history_opened", { totalDreamsOnRecord: dreams.length });
+      }
+    }
+  }, [loading, dreams.length]);
 
   const handleRecordDream = () => {
     navigate("/dreams/new");

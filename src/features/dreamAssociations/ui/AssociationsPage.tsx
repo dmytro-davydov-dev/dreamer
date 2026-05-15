@@ -31,6 +31,7 @@ import {
 } from "../../../services/firestore/firestoreRepo";
 import { nowTs } from "../../../services/firestore/timestamps";
 import { AssociationCard } from "../../../entities/association/ui";
+import { analytics } from "../../../services/analytics";
 import type {
   AssociationDoc,
   AssociationId,
@@ -180,6 +181,11 @@ export default function AssociationsPage({
           ...prev,
           [elementId]: result,
         }));
+
+        analytics.capture("association_added", {
+          emotionalValence: form.valence,
+          salience: form.salience as 1 | 2 | 3 | 4 | 5,
+        });
 
         setFormState((prev) => ({
           ...prev,

@@ -13,6 +13,8 @@ import {
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import type { DreamId, UID } from "../../../shared/types/domain";
+import { analytics } from "../../../services/analytics";
+import type { WordCountBucket } from "../../../services/analytics";
 import type {
   CreateDreamInput,
   UpdateDreamInput,
@@ -41,6 +43,14 @@ type DreamEntryPageProps = {
 };
 
 const DEFAULT_AUTOSAVE_MS = 600;
+
+function getWordCountBucket(text: string): WordCountBucket {
+  const count = text.trim().split(/\s+/).filter(Boolean).length;
+  if (count < 50) return "<50";
+  if (count < 150) return "50-150";
+  if (count < 500) return "150-500";
+  return "500+";
+}
 
 export default function DreamEntryPage({
   db,
@@ -72,6 +82,11 @@ export default function DreamEntryPage({
     }),
     [deps]
   );
+
+  useEffect(() => {
+    analytics.capture("dream_capture_started", { sessionNumber: 1 });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isContinueEnabled = rawText.trim().length > 0;
 
@@ -148,6 +163,11 @@ export default function DreamEntryPage({
   }, [rawText, mood, lifeContext, scheduleAutosave]);
 
   const handleContinue = async () => {
+    analytics.capture("dream_submitted", {
+      wordCountBucket: getWordCountBucket(rawText),
+      hasLifeContext: lifeContext.trim().length > 0,
+      hasMood: mood.trim().length > 0,
+    });
     await saveDraft();
     if (draftId && onContinue) onContinue(draftId);
   };
