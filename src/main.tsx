@@ -4,6 +4,7 @@ import App from "./app/App";
 import "./app/styles/base.css";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { initFirebase, ensureAnonymousAuth } from "./app/config/firebase";
+import { initSentry, initAnalytics } from "./services/analytics";
 
 import "./app/styles/tokens.css";
 
@@ -228,6 +229,8 @@ const theme = createTheme({
   },
 });
 
+initSentry();
+initAnalytics();
 initFirebase();
 ensureAnonymousAuth();
 
