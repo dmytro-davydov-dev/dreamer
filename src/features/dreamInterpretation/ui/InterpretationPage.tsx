@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import type { Firestore } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Box,
@@ -63,6 +64,7 @@ export default function InterpretationPage({
   dreamId,
   onContinue,
 }: InterpretationPageProps) {
+  const { t } = useTranslation();
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [dream, setDream] = useState<DreamDoc | null>(null);
   const [elements, setElements] = useState<Array<{ id: ElementId; data: DreamElementDoc }>>([]);
@@ -83,7 +85,7 @@ export default function InterpretationPage({
         ]);
 
         if (!dreamDoc) {
-          setError("Dream not found");
+          setError(t("interpretation.errors.dreamNotFound"));
           setPageStatus("error");
           return;
         }
@@ -95,7 +97,7 @@ export default function InterpretationPage({
         setPageStatus("ready");
       } catch (err) {
         console.error("Failed to load interpretation page:", err);
-        setError("Could not load dream. Please try again.");
+        setError(t("interpretation.errors.loadDreamFailed"));
         setPageStatus("error");
       }
     };
@@ -108,7 +110,7 @@ export default function InterpretationPage({
 
     const apiKey = getEffectiveLlmApiKey();
     if (!apiKey) {
-      setGenerateError("No API key found. Please check Settings.");
+      setGenerateError(t("interpretation.errors.noApiKey"));
       return;
     }
 
@@ -136,9 +138,9 @@ export default function InterpretationPage({
       console.error("Failed to generate hypotheses:", err);
 
       if (err instanceof LlmError) {
-        setGenerateError(`API Error: ${err.message}`);
+        setGenerateError(t("interpretation.errors.apiError", { message: err.message }));
       } else {
-        setGenerateError("Could not generate hypotheses. Please try again.");
+        setGenerateError(t("interpretation.errors.generateFailed"));
       }
 
       setPageStatus("ready");
@@ -171,7 +173,7 @@ export default function InterpretationPage({
         );
       } catch (err) {
         console.error("Failed to set feedback:", err);
-        setError("Could not save feedback. Please try again.");
+        setError(t("interpretation.errors.feedbackFailed"));
       } finally {
         setSavingFeedbackId(null);
       }
@@ -194,21 +196,20 @@ export default function InterpretationPage({
               variant="overline"
               sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dreamer - Step 4
+              {t("interpretation.step")}
             </Typography>
             <Typography
               variant="h4"
               component="h1"
               sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
-              Interpretation
+              {t("interpretation.title")}
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 560 }}
             >
-              Dreamer will generate hypotheses about what your dream might mean, grounded
-              in Jungian psychology. These are possibilities to explore, not conclusions.
+              {t("interpretation.subtitle")}
             </Typography>
           </Stack>
 
@@ -222,7 +223,7 @@ export default function InterpretationPage({
 
           {pageStatus === "error" && (
             <Alert severity="error">
-              {error || "Could not load this dream. Please return to the Dashboard and try again."}
+              {error || t("interpretation.errors.loadFailed")}
             </Alert>
           )}
 
@@ -236,15 +237,13 @@ export default function InterpretationPage({
                       component="h2"
                       sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                     >
-                      Generate Hypotheses
+                      {t("interpretation.generateTitle")}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                     >
-                      Based on your dream, elements, and personal associations, Dreamer
-                      will generate 2-3 Jungian hypotheses. Take what resonates, leave
-                      what doesn't.
+                      {t("interpretation.generateDescription")}
                     </Typography>
 
                     {getEffectiveLlmApiKey() ? (
@@ -264,8 +263,8 @@ export default function InterpretationPage({
                           sx={{ alignSelf: "flex-start" }}
                         >
                           {pageStatus === "generating"
-                            ? "Generating..."
-                            : "Generate hypotheses"}
+                            ? t("interpretation.generating")
+                            : t("interpretation.generateButton")}
                         </Button>
                         {generateError && (
                           <Alert severity="error">{generateError}</Alert>
@@ -285,7 +284,7 @@ export default function InterpretationPage({
                       variant="body2"
                       sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
-                      {hypotheses.length} hypotheses
+                      {t("interpretation.hypothesesCount", { count: hypotheses.length })}
                     </Typography>
                     {getEffectiveLlmApiKey() && (
                       <Button
@@ -306,7 +305,7 @@ export default function InterpretationPage({
                           fontSize: "12px",
                         }}
                       >
-                        Re-generate
+                        {t("interpretation.reGenerate")}
                       </Button>
                     )}
                     {generateError && (
@@ -346,7 +345,7 @@ export default function InterpretationPage({
                       variant="body2"
                       sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
-                      When you have explored these hypotheses, continue to integration.
+                      {t("interpretation.continueHint")}
                     </Typography>
                     <Button
                       variant="contained"
@@ -354,7 +353,7 @@ export default function InterpretationPage({
                       onClick={() => onContinue?.(dreamId)}
                       sx={{ whiteSpace: "nowrap" }}
                     >
-                      Continue to Integration
+                      {t("interpretation.continueButton")}
                     </Button>
                   </Stack>
                 </>

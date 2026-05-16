@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Box,
@@ -8,11 +9,14 @@ import {
   IconButton,
   InputAdornment,
   LinearProgress,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import i18n, { SUPPORTED_LANGUAGES } from "../../../app/i18n";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import KeyIcon from "@mui/icons-material/Key";
@@ -30,6 +34,7 @@ import {
 } from "../service/keyStorage.service";
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const [keyInput, setKeyInput] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -76,16 +81,49 @@ export default function SettingsPage() {
           {/* Header */}
           <Stack spacing={1}>
             <Typography variant="overline" sx={{ color: "var(--color-text-muted, #64748b)" }}>
-              Dreamer
+              {t("settings.header")}
             </Typography>
             <Typography
               variant="h4"
               component="h1"
               sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
-              Settings
+              {t("settings.title")}
             </Typography>
           </Stack>
+
+          {/* Language selector */}
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 3,
+              borderColor: "rgba(0, 212, 255, 0.12)",
+              backgroundColor: "rgba(15, 22, 41, 0.8)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <Stack spacing={2}>
+              <Typography variant="h6" component="h2" sx={{ color: "var(--color-text-primary, #e2e8f0)" }}>
+                {t("settings.language")}
+              </Typography>
+              <Select
+                size="small"
+                value={i18n.language.split("-")[0]}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                sx={{
+                  color: "var(--color-text-primary, #e2e8f0)",
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(0, 212, 255, 0.2)" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(0, 212, 255, 0.4)" },
+                  "& .MuiSvgIcon-root": { color: "var(--color-text-secondary, #94a3b8)" },
+                  maxWidth: 240,
+                }}
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <MenuItem key={lang.code} value={lang.code}>{lang.label}</MenuItem>
+                ))}
+              </Select>
+            </Stack>
+          </Paper>
 
           {/* Trial status — shown only when not using own key */}
           {!keyIsSet && (
@@ -113,7 +151,7 @@ export default function SettingsPage() {
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Free trial
+                    {t("settings.freeTrial.title")}
                   </Typography>
                 </Stack>
 
@@ -123,7 +161,7 @@ export default function SettingsPage() {
                       variant="body2"
                       sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                     >
-                      Dreams recorded with shared key
+                      {t("settings.freeTrial.dreamsRecorded")}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -148,10 +186,8 @@ export default function SettingsPage() {
                   sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                 >
                   {trialRemaining
-                    ? `You have ${TRIAL_DREAM_LIMIT - trialUsed} free dream${
-                        TRIAL_DREAM_LIMIT - trialUsed === 1 ? "" : "s"
-                      } remaining. Add your own key below for unlimited access.`
-                    : "Your free trial has ended. Add your own API key to keep recording dreams."}
+                    ? t("settings.freeTrial.dreamsRemaining", { count: TRIAL_DREAM_LIMIT - trialUsed })
+                    : t("settings.freeTrial.trialEnded")}
                 </Typography>
               </Stack>
             </Paper>
@@ -176,12 +212,11 @@ export default function SettingsPage() {
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Your API Key
+                    {t("settings.apiKey.title")}
                   </Typography>
                 </Stack>
                 <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
-                  Optional — add your own OpenAI-compatible API key for unlimited access.
-                  Your key is stored only in this browser and is never sent to our servers.
+                  {t("settings.apiKey.description")}
                 </Typography>
               </Stack>
 
@@ -193,7 +228,7 @@ export default function SettingsPage() {
                   <Stack direction="row" spacing={1} alignItems="center">
                     <CheckCircleOutlineIcon sx={{ color: "#10b981", fontSize: 18 }} />
                     <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
-                      Key saved:{" "}
+                      {t("settings.apiKey.keySaved")}{" "}
                       <Box
                         component="span"
                         sx={{
@@ -213,7 +248,7 @@ export default function SettingsPage() {
                     onClick={handleClear}
                     sx={{ alignSelf: "flex-start" }}
                   >
-                    Remove key
+                    {t("settings.apiKey.removeKey")}
                   </Button>
                 </Stack>
               ) : null}
@@ -221,11 +256,11 @@ export default function SettingsPage() {
               {/* Key input */}
               <Stack spacing={2}>
                 <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
-                  {keyIsSet ? "Replace with a new key:" : "Enter your OpenAI-compatible API key:"}
+                  {keyIsSet ? t("settings.apiKey.replaceKey") : t("settings.apiKey.enterKey")}
                 </Typography>
                 <TextField
-                  label="API key"
-                  placeholder="sk-..."
+                  label={t("settings.apiKey.label")}
+                  placeholder={t("settings.apiKey.placeholder")}
                   type={showKey ? "text" : "password"}
                   value={keyInput}
                   onChange={(e) => setKeyInput(e.target.value)}
@@ -237,7 +272,7 @@ export default function SettingsPage() {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label={showKey ? "Hide key" : "Show key"}
+                          aria-label={showKey ? t("settings.apiKey.hideKey") : t("settings.apiKey.showKey")}
                           onClick={() => setShowKey((v) => !v)}
                           edge="end"
                           size="small"
@@ -259,11 +294,11 @@ export default function SettingsPage() {
                   disabled={!keyInput.trim()}
                   sx={{ alignSelf: "flex-start" }}
                 >
-                  Save key
+                  {t("settings.apiKey.saveKey")}
                 </Button>
                 {saved && (
                   <Alert severity="success" sx={{ py: 0.5 }}>
-                    Key saved locally.
+                    {t("settings.apiKey.savedLocally")}
                   </Alert>
                 )}
               </Stack>
@@ -273,10 +308,8 @@ export default function SettingsPage() {
               {/* Privacy note */}
               <Alert severity="info" icon={false} sx={{ py: 1 }}>
                 <Typography variant="body2">
-                  <strong>Privacy note:</strong> Your API key and dream content remain
-                  in your browser and your Firestore database. Dreamer never logs dream
-                  text or shares it with third parties beyond the AI provider you
-                  configure here.
+                  <strong>{t("settings.privacyNote.title")}</strong>{" "}
+                  {t("settings.privacyNote.body")}
                 </Typography>
               </Alert>
             </Stack>

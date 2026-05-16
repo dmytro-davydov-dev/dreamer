@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { NavLink } from "react-router";
 import type { DreamId } from "../../../shared/types/domain";
@@ -9,11 +10,6 @@ type DreamIntegrationPageProps = {
   dreamId?: DreamId;
 };
 
-const DEFAULT_QUESTIONS = [
-  "What feels most alive or unfinished about this dream right now?",
-  "What small step could honor the feeling this dream leaves you with?",
-];
-
 function getWordCountBucket(text: string): WordCountBucket {
   const count = text.trim().split(/\s+/).filter(Boolean).length;
   if (count < 50) return "<50";
@@ -23,6 +19,7 @@ function getWordCountBucket(text: string): WordCountBucket {
 }
 
 export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPageProps) {
+  const { t } = useTranslation();
   const [journalText, setJournalText] = useState("");
   const integrationFiredRef = useRef(false);
 
@@ -54,7 +51,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                 color: "var(--color-text-muted, #64748b)",
               }}
             >
-              Dreamer
+              {t("integration.header")}
             </Typography>
             <Typography
               variant="h4"
@@ -64,7 +61,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                 fontWeight: 700,
               }}
             >
-              Integration
+              {t("integration.title")}
             </Typography>
           </Stack>
 
@@ -82,14 +79,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                   variant="h6"
                   sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                 >
-                  Choose a dream to continue integration
+                  {t("integration.chooseDream")}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ color: "var(--color-text-muted, #64748b)" }}
                 >
-                  Select a dream from your history or record a new one to begin
-                  integration.
+                  {t("integration.chooseDreamDescription")}
                 </Typography>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Button
@@ -98,7 +94,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component={NavLink}
                     to="/"
                   >
-                    View Dashboard
+                    {t("integration.viewDashboard")}
                   </Button>
                   <Button
                     variant="contained"
@@ -106,7 +102,7 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component={NavLink}
                     to="/dreams/new"
                   >
-                    Record a Dream
+                    {t("integration.recordDream")}
                   </Button>
                 </Stack>
               </Stack>
@@ -127,14 +123,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Reflective Summary
+                    {t("integration.reflectiveSummary")}
                   </Typography>
                   <Typography
                     variant="body1"
                     sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                   >
-                    This is a gentle summary of what has surfaced so far. Let it
-                    be a starting point rather than a conclusion.
+                    {t("integration.reflectiveSummaryDescription")}
                   </Typography>
                 </Stack>
               </Paper>
@@ -153,10 +148,10 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Reflective Questions
+                    {t("integration.reflectiveQuestions")}
                   </Typography>
                   <Stack spacing={1.5}>
-                    {DEFAULT_QUESTIONS.map((question) => (
+                    {([t("integration.question1"), t("integration.question2")] as const).map((question) => (
                       <Typography
                         key={question}
                         variant="body1"
@@ -183,14 +178,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Practice Suggestion
+                    {t("integration.practiceSuggestion")}
                   </Typography>
                   <Typography
                     variant="body1"
                     sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                   >
-                    Try a small, grounding action that echoes the dream's feeling
-                    or image. Keep it gentle and optional.
+                    {t("integration.practiceSuggestionDescription")}
                   </Typography>
                 </Stack>
               </Paper>
@@ -209,13 +203,13 @@ export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPagePr
                     component="h2"
                     sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                   >
-                    Journal
+                    {t("integration.journal")}
                   </Typography>
                   <TextField
-                    label="Journal (optional)"
+                    label={t("integration.journalLabel")}
                     multiline
                     minRows={4}
-                    placeholder="Write anything that feels worth keeping."
+                    placeholder={t("integration.journalPlaceholder")}
                     fullWidth
                     value={journalText}
                     onChange={(e) => setJournalText(e.target.value)}

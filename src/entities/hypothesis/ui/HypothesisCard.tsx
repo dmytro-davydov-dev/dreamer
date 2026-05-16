@@ -20,6 +20,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type {
   AssociationDoc,
@@ -40,12 +41,12 @@ interface HypothesisCardProps {
   isSavingFeedback?: boolean;
 }
 
-const LENS_LABELS: Record<JungianLens, string> = {
-  compensation: "Compensation",
-  shadow: "Shadow",
-  archetypal_dynamics: "Archetypal Dynamics",
-  relational_anima_animus: "Anima / Animus",
-  individuation: "Individuation",
+const LENS_KEYS: Record<JungianLens, string> = {
+  compensation: "hypothesisCard.lenses.compensation",
+  shadow: "hypothesisCard.lenses.shadow",
+  archetypal_dynamics: "hypothesisCard.lenses.archetypal_dynamics",
+  relational_anima_animus: "hypothesisCard.lenses.relational_anima_animus",
+  individuation: "hypothesisCard.lenses.individuation",
 };
 
 export default function HypothesisCard({
@@ -55,16 +56,11 @@ export default function HypothesisCard({
   onFeedback,
   isSavingFeedback = false,
 }: HypothesisCardProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const { id, data } = hypothesis;
   const isResonates = data.userFeedback === "resonates";
   const isDoesNotFit = data.userFeedback === "does_not_fit";
-
-  const evidenceTypeLabel: Record<string, string> = {
-    dream_text: "Dream Text",
-    element: "Element",
-    association: "Association",
-  };
 
   const resolveRefLabel = (type: string, refId: string): string => {
     if (type === "element") {
@@ -103,7 +99,7 @@ export default function HypothesisCard({
         <Stack spacing={1.5} sx={{ width: "100%", pr: 1 }}>
           <Box>
             <Chip
-              label={LENS_LABELS[data.lens]}
+              label={t(LENS_KEYS[data.lens])}
               size="small"
               sx={{
                 fontSize: "10px",
@@ -137,7 +133,7 @@ export default function HypothesisCard({
               fontStyle: "italic",
             }}
           >
-            One possible interpretation, not a conclusion.
+            {t("hypothesisCard.disclaimer")}
           </Typography>
 
           <Box>
@@ -152,7 +148,7 @@ export default function HypothesisCard({
                 mb: 0.75,
               }}
             >
-              Reflective Question
+              {t("hypothesisCard.reflectiveQuestion")}
             </Typography>
             <Typography
               variant="body2"
@@ -177,7 +173,7 @@ export default function HypothesisCard({
                 mb: 1,
               }}
             >
-              Evidence References
+              {t("hypothesisCard.evidenceReferences")}
             </Typography>
             <Stack spacing={1}>
               {data.evidence.map((ev, idx) => (
@@ -189,7 +185,7 @@ export default function HypothesisCard({
                 >
                   <Chip
                     size="small"
-                    label={`${evidenceTypeLabel[ev.type] ?? "Evidence"} - ${resolveRefLabel(ev.type, ev.refId)}`}
+                    label={`${t(`hypothesisCard.evidenceTypes.${ev.type}`) || t("hypothesisCard.evidenceTypes.default")} - ${resolveRefLabel(ev.type, ev.refId)}`}
                     sx={{
                       height: "22px",
                       fontSize: "11px",
@@ -234,7 +230,7 @@ export default function HypothesisCard({
                 flex: 1,
               }}
             >
-              Resonates
+              {t("hypothesisCard.resonates")}
             </Button>
             <Button
               variant={isDoesNotFit ? "contained" : "outlined"}
@@ -257,7 +253,7 @@ export default function HypothesisCard({
                 flex: 1,
               }}
             >
-              Doesn't fit
+              {t("hypothesisCard.doesNotFit")}
             </Button>
           </Stack>
         </Stack>

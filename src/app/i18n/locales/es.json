@@ -1,0 +1,345 @@
+{
+  "appName": "Dreamer",
+
+  "nav": {
+    "dashboard": "Panel",
+    "recordDream": "Registrar Sueño",
+    "dreamBreakdown": "Análisis del Sueño",
+    "associations": "Asociaciones",
+    "interpretation": "Interpretación",
+    "integration": "Integración",
+    "settings": "Configuración",
+    "about": "Acerca de",
+    "openMenu": "Abrir menú"
+  },
+
+  "auth": {
+    "anonymous": "Anónimo",
+    "guestSession": "Sesión de invitado",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "signUp": "Registrarse",
+    "createAccount": "Crear Cuenta",
+    "continueAsGuest": "Continuar como Invitado",
+    "welcomeBack": "Bienvenido de nuevo. Inicia sesión para continuar.",
+    "createAccountPrompt": "Crea una cuenta para comenzar.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "or": "o",
+    "errors": {
+      "invalidCredential": "Correo electrónico o contraseña inválidos.",
+      "emailInUse": "Ya existe una cuenta con este correo electrónico.",
+      "weakPassword": "La contraseña debe tener al menos 6 caracteres.",
+      "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida.",
+      "tooManyRequests": "Demasiados intentos. Por favor, espera un momento y vuelve a intentarlo.",
+      "operationNotAllowed": "El inicio de sesión con correo/contraseña no está habilitado. Actívalo en la consola de Firebase en Autenticación → Métodos de inicio de sesión.",
+      "default": "Algo salió mal. Por favor, inténtalo de nuevo.",
+      "guestSignInFailed": "No se pudo iniciar sesión como invitado. Por favor, inténtalo de nuevo."
+    }
+  },
+
+  "dashboard": {
+    "dreamJournal": "Diario de Sueños",
+    "dreamHistory": "Historial de Sueños",
+    "recordDream": "Registrar Sueño",
+    "noDreamsYet": "Aún no hay sueños",
+    "startJourneyPrompt": "Comienza tu viaje de trabajo con sueños registrando tu primer sueño",
+    "getStarted": "Comenzar"
+  },
+
+  "dreamEntry": {
+    "step": "Dreamer · Paso 1",
+    "title": "Registra tu sueño",
+    "subtitle": "Captura tu sueño tal como lo recuerdas — ningún detalle es demasiado pequeño.",
+    "dreamLabel": "Sueño",
+    "dreamPlaceholder": "Escribe tu sueño tal como lo recuerdas...",
+    "voiceTranscribing": "Transcribiendo…",
+    "voiceStop": "Detener grabación",
+    "voiceStart": "Iniciar grabación de voz",
+    "voiceRecordingHint": "Habla ahora — Whisper transcribirá y añadirá el texto.",
+    "voiceActiveHint": "Grabando… Presiona «Detener grabación» cuando termines.",
+    "voiceTranscribingHint": "Transcribiendo voz con Whisper…",
+    "moodLabel": "Estado de ánimo al despertar (opcional)",
+    "moodPlaceholder": "ej. ansioso, tranquilo, curioso...",
+    "lifeContextLabel": "Contexto de vida (opcional)",
+    "lifeContextPlaceholder": "¿Qué ha ocupado tu mente últimamente?",
+    "continue": "Continuar",
+    "errors": {
+      "noApiKey": "No se encontró la clave de API. Por favor, añade tu clave de OpenAI en Configuración.",
+      "microphoneDenied": "Acceso al micrófono denegado. Por favor, permite el micrófono y vuelve a intentarlo."
+    }
+  },
+
+  "dreamBreakdown": {
+    "step": "Dreamer · Paso 2",
+    "title": "Análisis del Sueño",
+    "subtitle": "Estos son los elementos que Dreamer encontró en tu sueño. Edita, elimina o añade lo que parezca más preciso — tu percepción del sueño siempre es primaria.",
+    "dreamTextLabel": "Texto del sueño",
+    "editDreamText": "Editar texto del sueño",
+    "saving": "Guardando…",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "extractElements": "Extraer elementos",
+    "extractDescription": "Dreamer leerá tu sueño e identificará sus personajes, símbolos, lugares, emociones y acciones — sin ninguna interpretación.",
+    "extracting": "Extrayendo…",
+    "reExtract": "Reextraer",
+    "elementCount_one": "{{count}} elemento",
+    "elementCount_other": "{{count}} elementos",
+    "continueHint": "Cuando estés satisfecho, continúa para añadir tus asociaciones personales.",
+    "continueButton": "Continuar a Asociaciones",
+    "errors": {
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel e inténtalo de nuevo.",
+      "extractFailed": "Algo salió mal durante la extracción. Por favor, inténtalo de nuevo."
+    },
+    "kinds": {
+      "symbol": "Símbolos",
+      "character": "Personajes",
+      "place": "Lugares",
+      "emotion": "Emociones",
+      "action": "Acciones",
+      "shift": "Cambios"
+    },
+    "actions": {
+      "confirm": "Confirmar",
+      "editLabel": "Editar etiqueta",
+      "remove": "Eliminar",
+      "confirmEdit": "Confirmar edición",
+      "editElementLabel": "Editar etiqueta del elemento",
+      "removeElement": "Eliminar elemento",
+      "add": "Añadir"
+    }
+  },
+
+  "associations": {
+    "step": "Dreamer · Paso 3",
+    "title": "Asociaciones Personales",
+    "subtitle": "Cada elemento tiene un significado personal. ¿Qué significan estos elementos para ti? Captura tus asociaciones, tono emocional y cuánto resuena cada uno.",
+    "associationLabel": "Tu asociación",
+    "associationPlaceholder": "Tu asociación o lo que esto significa para ti",
+    "emotionalTone": "Tono emocional",
+    "valence": {
+      "positive": "Positivo",
+      "mixed": "Mixto",
+      "negative": "Negativo"
+    },
+    "salience": "Saliencia (1-5)",
+    "saliencePersonal": "Saliencia (resonancia personal)",
+    "saveAssociation": "Guardar Asociación",
+    "saving": "Guardando...",
+    "continueHint": "Cuando hayas capturado tus asociaciones, continúa con la interpretación.",
+    "continueButton": "Continuar a Interpretación",
+    "noElements": "No se encontraron elementos en tu sueño. Regresa al Análisis del Sueño y asegúrate de que los elementos estén extraídos antes de continuar.",
+    "errors": {
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel e inténtalo de nuevo.",
+      "dreamNotFound": "Sueño no encontrado",
+      "loadDreamFailed": "No se pudo cargar el sueño. Por favor, inténtalo de nuevo.",
+      "saveFailed": "No se pudo guardar la asociación. Por favor, inténtalo de nuevo.",
+      "updateFailed": "No se pudo actualizar la asociación. Por favor, inténtalo de nuevo.",
+      "deleteFailed": "No se pudo eliminar la asociación. Por favor, inténtalo de nuevo."
+    }
+  },
+
+  "interpretation": {
+    "step": "Dreamer · Paso 4",
+    "title": "Interpretación",
+    "subtitle": "Dreamer generará hipótesis sobre lo que tu sueño podría significar, basadas en la psicología junguiana. Son posibilidades a explorar, no conclusiones.",
+    "generateTitle": "Generar Hipótesis",
+    "generateDescription": "Basándose en tu sueño, elementos y asociaciones personales, Dreamer generará 2-3 hipótesis junguianas. Quédate con lo que resuena, deja lo que no.",
+    "generating": "Generando...",
+    "generateButton": "Generar hipótesis",
+    "reGenerate": "Regenerar",
+    "hypothesesCount_one": "{{count}} hipótesis",
+    "hypothesesCount_other": "{{count}} hipótesis",
+    "continueHint": "Cuando hayas explorado estas hipótesis, continúa con la integración.",
+    "continueButton": "Continuar a Integración",
+    "errors": {
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel e inténtalo de nuevo.",
+      "dreamNotFound": "Sueño no encontrado",
+      "loadDreamFailed": "No se pudo cargar el sueño. Por favor, inténtalo de nuevo.",
+      "generateFailed": "No se pudieron generar hipótesis. Por favor, inténtalo de nuevo.",
+      "apiError": "Error de API: {{message}}",
+      "noApiKey": "No se encontró la clave de API. Por favor, verifica la Configuración.",
+      "feedbackFailed": "No se pudo guardar el feedback. Por favor, inténtalo de nuevo."
+    }
+  },
+
+  "integration": {
+    "header": "Dreamer",
+    "title": "Integración",
+    "chooseDream": "Elige un sueño para continuar la integración",
+    "chooseDreamDescription": "Selecciona un sueño de tu historial o registra uno nuevo para comenzar la integración.",
+    "viewDashboard": "Ver Panel",
+    "recordDream": "Registrar Sueño",
+    "reflectiveSummary": "Resumen Reflexivo",
+    "reflectiveSummaryDescription": "Este es un resumen suave de lo que ha surgido hasta ahora. Que sea un punto de partida, no una conclusión.",
+    "reflectiveQuestions": "Preguntas Reflexivas",
+    "question1": "¿Qué se siente más vivo o inconcluso en este sueño ahora mismo?",
+    "question2": "¿Qué pequeño paso podría honrar el sentimiento que este sueño te deja?",
+    "practiceSuggestion": "Sugerencia de Práctica",
+    "practiceSuggestionDescription": "Prueba una pequeña acción de anclaje que refleje el sentimiento o la imagen del sueño. Mantenla suave y opcional.",
+    "journal": "Diario",
+    "journalLabel": "Diario (opcional)",
+    "journalPlaceholder": "Escribe cualquier cosa que valga la pena conservar."
+  },
+
+  "settings": {
+    "header": "Dreamer",
+    "title": "Configuración",
+    "language": "Idioma",
+    "freeTrial": {
+      "title": "Prueba gratuita",
+      "dreamsRecorded": "Sueños registrados con clave compartida",
+      "dreamsRemaining_one": "Tienes {{count}} sueño gratuito restante. Añade tu propia clave abajo para acceso ilimitado.",
+      "dreamsRemaining_other": "Tienes {{count}} sueños gratuitos restantes. Añade tu propia clave abajo para acceso ilimitado.",
+      "trialEnded": "Tu prueba gratuita ha terminado. Añade tu propia clave de API para continuar registrando sueños."
+    },
+    "apiKey": {
+      "title": "Tu Clave de API",
+      "description": "Opcional — añade tu propia clave de API compatible con OpenAI para acceso ilimitado. Tu clave se almacena solo en este navegador y nunca se envía a nuestros servidores.",
+      "keySaved": "Clave guardada:",
+      "removeKey": "Eliminar clave",
+      "replaceKey": "Reemplazar con una nueva clave:",
+      "enterKey": "Introduce tu clave de API compatible con OpenAI:",
+      "label": "Clave de API",
+      "placeholder": "sk-...",
+      "showKey": "Mostrar clave",
+      "hideKey": "Ocultar clave",
+      "saveKey": "Guardar clave",
+      "savedLocally": "Clave guardada localmente."
+    },
+    "privacyNote": {
+      "title": "Nota de privacidad:",
+      "body": "Tu clave de API y el contenido de los sueños permanecen en tu navegador y en tu base de datos Firestore. Dreamer nunca registra el texto de los sueños ni lo comparte con terceros más allá del proveedor de IA que configures aquí."
+    }
+  },
+
+  "byokGate": {
+    "freeTrial": "Prueba gratuita",
+    "dreamsLeft": "{{remaining}} de {{total}} sueños restantes",
+    "usingSharedKey": "Estás usando una clave compartida.",
+    "addOwnKey": "Añade tu propia clave de API",
+    "inSettingsForUnlimited": "en Configuración para acceso ilimitado.",
+    "trialUsedUp": "Prueba gratuita agotada",
+    "trialExhausted": "Has usado todos los {{total}} sueños de prueba gratuita. Añade tu propia clave de API compatible con OpenAI en Configuración para continuar.",
+    "goToSettings": "Ir a Configuración",
+    "addedMyKey": "Ya añadí mi clave"
+  },
+
+  "hypothesisCard": {
+    "disclaimer": "Una posible interpretación, no una conclusión.",
+    "reflectiveQuestion": "Pregunta Reflexiva",
+    "evidenceReferences": "Referencias de Evidencia",
+    "resonates": "Resuena",
+    "doesNotFit": "No encaja",
+    "lenses": {
+      "compensation": "Compensación",
+      "shadow": "Sombra",
+      "archetypal_dynamics": "Dinámicas Arquetípicas",
+      "relational_anima_animus": "Anima / Animus",
+      "individuation": "Individuación"
+    },
+    "evidenceTypes": {
+      "dream_text": "Texto del Sueño",
+      "element": "Elemento",
+      "association": "Asociación",
+      "default": "Evidencia"
+    }
+  },
+
+  "associationCard": {
+    "yourAssociation": "Tu asociación",
+    "emotionalTone": "Tono emocional",
+    "saliencePersonal": "Saliencia (resonancia personal)",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "valence": {
+      "positive": "Positivo",
+      "negative": "Negativo",
+      "mixed": "Mixto"
+    }
+  },
+
+  "statusBadge": {
+    "draft": "Borrador",
+    "structured": "Estructurado",
+    "associated": "Asociado",
+    "interpreted": "Interpretado",
+    "integrated": "Integrado"
+  },
+
+  "dreamListItem": {
+    "mood": "estado de ánimo: {{mood}}"
+  },
+
+  "placeholders": {
+    "dreamEntry": {
+      "title": "Registro de Sueño",
+      "description": "No se pudo iniciar el registro del sueño. Por favor, inténtalo de nuevo en un momento."
+    },
+    "dreamSession": {
+      "title": "Sesión de Sueño",
+      "description": "No se pudo cargar este sueño. Por favor, regresa al Panel."
+    },
+    "dreamBreakdown": {
+      "title": "Análisis del Sueño",
+      "noParam": "Ningún sueño seleccionado. Por favor, registra un sueño primero.",
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel.",
+      "recordFirst": "Registra un sueño primero, luego vuelve aquí para estructurarlo."
+    },
+    "associations": {
+      "title": "Asociaciones",
+      "noParam": "Ningún sueño seleccionado. Por favor, registra un sueño primero.",
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel.",
+      "recordFirst": "Registra un sueño primero, luego vuelve aquí para añadir asociaciones."
+    },
+    "interpretation": {
+      "title": "Interpretación",
+      "noParam": "Ningún sueño seleccionado. Por favor, registra un sueño primero.",
+      "loadFailed": "No se pudo cargar este sueño. Por favor, regresa al Panel.",
+      "recordFirst": "Registra un sueño primero, luego vuelve aquí para revisar hipótesis."
+    }
+  },
+
+  "about": {
+    "title": "Dreamer",
+    "subtitle": "Una herramienta para el trabajo junguiano con sueños y reflexión interior",
+    "start": "Comenzar →",
+    "disclaimer": "Este proyecto está destinado a la reflexión personal y la exploración educativa. No es un sustituto de la psicoterapia o la atención profesional de salud mental.",
+    "jung": {
+      "heading": "¿Qué es el Trabajo Junguiano con Sueños?",
+      "p1": "Carl Jung creía que los sueños no son ruido aleatorio, sino comunicaciones significativas del inconsciente psíquico. Donde Freud se enfocaba en deseos reprimidos, Jung veía los sueños como mensajes compensatorios — el inconsciente mostrándonos lo que nuestra mente consciente ignora, descuida o aún no puede integrar.",
+      "p2": "Centrales en el marco de Jung son algunas ideas fundamentales. La <accent>sombra</accent> contiene cualidades que negamos en nosotros mismos — tanto oscuras como luminosas. El <accent>anima / animus</accent> representa la figura interior contrasexual que media entre el ego y el inconsciente más profundo. El <accent>Self</accent> es el centro organizador de toda la psique, apareciendo frecuentemente en sueños como una figura de autoridad, un anciano sabio o un símbolo numinoso. A través del trabajo con sueños, comenzamos a reconocer estas figuras no como extraños, sino como partes de nosotros mismos que buscan reconocimiento.",
+      "p3": "El método de <accent>amplificación</accent> de Jung pide al soñador que circule un símbolo hacia afuera — asociándolo con memorias personales, paralelos culturales y temas arquetípicos — en lugar de reducirlo a un único significado fijo. El objetivo no es una respuesta definitiva sino un diálogo más rico con el inconsciente."
+    },
+    "innerWork": {
+      "heading": "<em>Trabajo Interior</em> de Robert A. Johnson",
+      "p1": "El analista Robert A. Johnson destiló el enfoque de Jung en una práctica de cuatro pasos en su libro <em>Trabajo Interior</em>. Primero, reúne tus <accent>asociaciones</accent> — ¿qué evoca cada imagen de tu propia vida? Segundo, <accent>conecta el sueño con tu vida interior</accent> — trata cada figura como un aspecto de tu propia psique en lugar de como un comentario sobre otras personas. Tercero, interpreta — forma <accent>hipótesis</accent> provisionales y sostenlas ligeramente. Cuarto, haz el insight <accent>concreto</accent> a través de un pequeño ritual o acto vivido que honre lo que el sueño te pidió.",
+      "p2": "Johnson insiste en que las interpretaciones son siempre provisionales. Ningún símbolo tiene un significado universal fijo. Las propias asociaciones del soñador vienen primero, y el trabajo con sueños más valioso termina no en una lectura inteligente sino en un cambio modesto y encarnado."
+    },
+    "howItWorks": {
+      "heading": "Cómo Funciona Esta Aplicación",
+      "intro": "Dreamer te guía a través de los cuatro pasos de Johnson como una sesión estructurada:",
+      "steps": {
+        "record": {
+          "title": "Registrar",
+          "description": "Escribe tu sueño en texto libre. La aplicación lo analiza en personajes, símbolos, escenarios, emociones y cambios narrativos para que nada se pierda."
+        },
+        "associate": {
+          "title": "Asociar",
+          "description": "Para cada elemento, proporcionas tus propias asociaciones personales. La aplicación nunca reemplaza estas con definiciones de diccionario."
+        },
+        "interpret": {
+          "title": "Interpretar",
+          "description": "Usando tu sueño y asociaciones, la IA genera varias hipótesis claramente etiquetadas — compensación, sombra, anima/animus, arquetípica e individuación. Cada una es una pregunta para contemplar, no un veredicto."
+        },
+        "integrate": {
+          "title": "Integrar",
+          "description": "La aplicación sugiere una acción pequeña y concreta para traer el insight del sueño a la vida cotidiana — en el espíritu del paso ritual de Johnson."
+        }
+      },
+      "footnote": "Todas las interpretaciones se enmarcan como hipótesis. Tus asociaciones tienen precedencia sobre cualquier sugestión de la IA. La aplicación está diseñada para la reflexión personal — no hace afirmaciones diagnósticas o terapéuticas, y tus datos permanecen privados."
+    }
+  }
+}

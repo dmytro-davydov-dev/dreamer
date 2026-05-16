@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Chip,
@@ -42,10 +43,10 @@ interface AssociationCardProps {
   ) => void;
 }
 
-const VALENCE_LABELS: Record<EmotionalValence, string> = {
-  positive: "Positive",
-  negative: "Negative",
-  mixed: "Mixed",
+const VALENCE_KEYS: Record<EmotionalValence, string> = {
+  positive: "associationCard.valence.positive",
+  negative: "associationCard.valence.negative",
+  mixed: "associationCard.valence.mixed",
 };
 
 const VALENCE_COLORS: Record<EmotionalValence, string> = {
@@ -91,6 +92,7 @@ export default function AssociationCard({
   onDelete,
   onEdit,
 }: AssociationCardProps) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(association.data.associationText);
   const [editValence, setEditValence] = useState(association.data.emotionalValence);
@@ -165,13 +167,13 @@ export default function AssociationCard({
               backgroundColor: "rgba(0, 0, 0, 0.3)",
               "& input, & textarea": { py: 0.5 },
             }}
-            placeholder="Your association"
+            placeholder={t("associationCard.yourAssociation")}
           />
 
           {/* Valence toggle */}
           <Box>
             <Typography variant="caption" sx={{ color: "var(--color-text-muted, #64748b)" }}>
-              Emotional tone
+              {t("associationCard.emotionalTone")}
             </Typography>
             <ToggleButtonGroup
               exclusive
@@ -198,7 +200,7 @@ export default function AssociationCard({
                     textTransform: "none",
                   }}
                 >
-                  {VALENCE_LABELS[val]}
+                  {t(VALENCE_KEYS[val])}
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
@@ -207,14 +209,14 @@ export default function AssociationCard({
           {/* Salience dots */}
           <Box>
             <Typography variant="caption" sx={{ color: "var(--color-text-muted, #64748b)", display: "block", mb: 0.75 }}>
-              Salience (personal resonance)
+              {t("associationCard.saliencePersonal")}
             </Typography>
             <SalienceDots salience={editSalience} onSalienceChange={setEditSalience} interactive />
           </Box>
 
           {/* Actions */}
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <Tooltip title="Cancel">
+            <Tooltip title={t("associationCard.cancel")}>
               <IconButton
                 size="small"
                 onClick={cancelEdit}
@@ -223,7 +225,7 @@ export default function AssociationCard({
                 <CloseIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Save">
+            <Tooltip title={t("associationCard.save")}>
               <IconButton
                 size="small"
                 onClick={commitEdit}
@@ -278,7 +280,7 @@ export default function AssociationCard({
                 fontSize: "10px",
               }}
             >
-              {VALENCE_LABELS[association.data.emotionalValence]}
+              {t(VALENCE_KEYS[association.data.emotionalValence])}
             </Typography>
             <Box sx={{ flex: 1 }} />
             <SalienceDots salience={association.data.salience} />
@@ -307,7 +309,7 @@ export default function AssociationCard({
             transition: "opacity 0.15s",
           }}
         >
-          <Tooltip title="Edit">
+          <Tooltip title={t("associationCard.edit")}>
             <IconButton
               size="small"
               onClick={() => setEditing(true)}
@@ -319,7 +321,7 @@ export default function AssociationCard({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t("associationCard.delete")}>
             <IconButton
               size="small"
               onClick={() => onDelete?.(association.id)}

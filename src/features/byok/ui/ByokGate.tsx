@@ -11,6 +11,7 @@
  */
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, Box, Button, Chip, Stack, Typography } from "@mui/material";
 import KeyIcon from "@mui/icons-material/Key";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
@@ -28,6 +29,7 @@ type ByokGateProps = {
 };
 
 export default function ByokGate({ children }: ByokGateProps) {
+  const { t } = useTranslation();
   const [ownKey, setOwnKey] = useState(hasLlmApiKey);
   const [trialRemaining, setTrialRemaining] = useState(hasTrialDreamsRemaining);
 
@@ -56,10 +58,10 @@ export default function ByokGate({ children }: ByokGateProps) {
           <Stack spacing={0.5}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" fontWeight={600}>
-                Free trial
+                {t("byokGate.freeTrial")}
               </Typography>
               <Chip
-                label={`${remaining} of ${TRIAL_DREAM_LIMIT} dreams left`}
+                label={t("byokGate.dreamsLeft", { remaining, total: TRIAL_DREAM_LIMIT })}
                 size="small"
                 color="info"
                 variant="outlined"
@@ -67,15 +69,15 @@ export default function ByokGate({ children }: ByokGateProps) {
               />
             </Stack>
             <Typography variant="body2">
-              You're using a shared key.{" "}
+              {t("byokGate.usingSharedKey")}{" "}
               <Box
                 component={NavLink}
                 to="/settings"
                 sx={{ color: "inherit", fontWeight: 600 }}
               >
-                Add your own API key
+                {t("byokGate.addOwnKey")}
               </Box>{" "}
-              in Settings for unlimited access.
+              {t("byokGate.inSettingsForUnlimited")}
             </Typography>
           </Stack>
         </Alert>
@@ -94,11 +96,10 @@ export default function ByokGate({ children }: ByokGateProps) {
       <Stack spacing={1.5}>
         <Box>
           <Typography variant="body2" fontWeight={600}>
-            Free trial used up
+            {t("byokGate.trialUsedUp")}
           </Typography>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            You've used all {TRIAL_DREAM_LIMIT} free trial dreams. Add your own
-            OpenAI-compatible API key in Settings to continue.
+            {t("byokGate.trialExhausted", { total: TRIAL_DREAM_LIMIT })}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1}>
@@ -109,7 +110,7 @@ export default function ByokGate({ children }: ByokGateProps) {
             size="small"
             color="warning"
           >
-            Go to Settings
+            {t("byokGate.goToSettings")}
           </Button>
           <Button
             variant="text"
@@ -117,7 +118,7 @@ export default function ByokGate({ children }: ByokGateProps) {
             color="warning"
             onClick={handleRefresh}
           >
-            I've added my key
+            {t("byokGate.addedMyKey")}
           </Button>
         </Stack>
       </Stack>

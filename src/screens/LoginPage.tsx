@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -29,6 +30,7 @@ const inputSx = {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,19 +46,19 @@ export default function LoginPage() {
       case "auth/user-not-found":
       case "auth/wrong-password":
       case "auth/invalid-credential":
-        return "Invalid email or password.";
+        return t("auth.errors.invalidCredential");
       case "auth/email-already-in-use":
-        return "An account with this email already exists.";
+        return t("auth.errors.emailInUse");
       case "auth/weak-password":
-        return "Password must be at least 6 characters.";
+        return t("auth.errors.weakPassword");
       case "auth/invalid-email":
-        return "Please enter a valid email address.";
+        return t("auth.errors.invalidEmail");
       case "auth/too-many-requests":
-        return "Too many attempts. Please wait a moment and try again.";
+        return t("auth.errors.tooManyRequests");
       case "auth/operation-not-allowed":
-        return "Email/password sign-in is not enabled. Enable it in the Firebase console under Authentication → Sign-in methods.";
+        return t("auth.errors.operationNotAllowed");
       default:
-        return "Something went wrong. Please try again.";
+        return t("auth.errors.default");
     }
   }
 
@@ -97,7 +99,7 @@ export default function LoginPage() {
       await signInAsGuest();
       navigate("/about");
     } catch {
-      setError("Could not sign in as guest. Please try again.");
+      setError(t("auth.errors.guestSignInFailed"));
     } finally {
       setLoading(false);
     }
@@ -139,10 +141,10 @@ export default function LoginPage() {
             mb: 0.5,
           }}
         >
-          Dreamer
+          {t("appName")}
         </Typography>
         <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)", mb: 3 }}>
-          {isSignIn ? "Welcome back. Sign in to continue." : "Create an account to get started."}
+          {isSignIn ? t("auth.welcomeBack") : t("auth.createAccountPrompt")}
         </Typography>
 
         {/* Mode toggle */}
@@ -163,7 +165,7 @@ export default function LoginPage() {
                 "&:hover": { backgroundColor: "rgba(0, 212, 255, 0.08)" },
               }}
             >
-              {m === "signin" ? "Sign In" : "Sign Up"}
+              {m === "signin" ? t("auth.signIn") : t("auth.signUp")}
             </Button>
           ))}
         </Box>
@@ -171,7 +173,7 @@ export default function LoginPage() {
         {/* Form */}
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
-            label="Email"
+            label={t("auth.email")}
             type="email"
             fullWidth
             required
@@ -182,7 +184,7 @@ export default function LoginPage() {
             autoComplete="email"
           />
           <TextField
-            label="Password"
+            label={t("auth.password")}
             type="password"
             fullWidth
             required
@@ -228,16 +230,16 @@ export default function LoginPage() {
             {loading ? (
               <CircularProgress size={20} sx={{ color: "#080c14" }} />
             ) : isSignIn ? (
-              "Sign In"
+              t("auth.signIn")
             ) : (
-              "Create Account"
+              t("auth.createAccount")
             )}
           </Button>
         </Box>
 
         <Divider sx={{ borderColor: "rgba(0, 212, 255, 0.1)", mb: 2 }}>
           <Typography variant="caption" sx={{ color: "var(--color-text-secondary, #94a3b8)", px: 1 }}>
-            or
+            {t("auth.or")}
           </Typography>
         </Divider>
 
@@ -262,7 +264,7 @@ export default function LoginPage() {
             "&:disabled": { opacity: 0.6 },
           }}
         >
-          Continue as Guest
+          {t("auth.continueAsGuest")}
         </Button>
       </Box>
     </Box>

@@ -1,0 +1,345 @@
+{
+  "appName": "Dreamer",
+
+  "nav": {
+    "dashboard": "Dashboard",
+    "recordDream": "Record a Dream",
+    "dreamBreakdown": "Dream Breakdown",
+    "associations": "Associations",
+    "interpretation": "Interpretation",
+    "integration": "Integration",
+    "settings": "Settings",
+    "about": "About",
+    "openMenu": "Open menu"
+  },
+
+  "auth": {
+    "anonymous": "Anonymous",
+    "guestSession": "Guest session",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "continueAsGuest": "Continue as Guest",
+    "welcomeBack": "Welcome back. Sign in to continue.",
+    "createAccountPrompt": "Create an account to get started.",
+    "email": "Email",
+    "password": "Password",
+    "or": "or",
+    "errors": {
+      "invalidCredential": "Invalid email or password.",
+      "emailInUse": "An account with this email already exists.",
+      "weakPassword": "Password must be at least 6 characters.",
+      "invalidEmail": "Please enter a valid email address.",
+      "tooManyRequests": "Too many attempts. Please wait a moment and try again.",
+      "operationNotAllowed": "Email/password sign-in is not enabled. Enable it in the Firebase console under Authentication → Sign-in methods.",
+      "default": "Something went wrong. Please try again.",
+      "guestSignInFailed": "Could not sign in as guest. Please try again."
+    }
+  },
+
+  "dashboard": {
+    "dreamJournal": "Dream Journal",
+    "dreamHistory": "Dream History",
+    "recordDream": "Record a Dream",
+    "noDreamsYet": "No dreams yet",
+    "startJourneyPrompt": "Start your dreamwork journey by recording your first dream",
+    "getStarted": "Get Started"
+  },
+
+  "dreamEntry": {
+    "step": "Dreamer · Step 1",
+    "title": "Record your dream",
+    "subtitle": "Capture your dream as you remember it — no detail is too small.",
+    "dreamLabel": "Dream",
+    "dreamPlaceholder": "Write your dream as you remember it...",
+    "voiceTranscribing": "Transcribing…",
+    "voiceStop": "Stop recording",
+    "voiceStart": "Start voice recording",
+    "voiceRecordingHint": "Speak now — Whisper will transcribe and add the text.",
+    "voiceActiveHint": "Recording… Press «Stop recording» when done.",
+    "voiceTranscribingHint": "Transcribing speech via Whisper…",
+    "moodLabel": "Waking mood (optional)",
+    "moodPlaceholder": "e.g. anxious, peaceful, curious...",
+    "lifeContextLabel": "Life context (optional)",
+    "lifeContextPlaceholder": "What's been on your mind lately?",
+    "continue": "Continue",
+    "errors": {
+      "noApiKey": "No API key found. Please add your OpenAI key in Settings.",
+      "microphoneDenied": "Microphone access denied. Please allow microphone and try again."
+    }
+  },
+
+  "dreamBreakdown": {
+    "step": "Dreamer · Step 2",
+    "title": "Dream Breakdown",
+    "subtitle": "These are the elements Dreamer found in your dream. Edit, remove, or add anything that feels more accurate — your sense of the dream is always primary.",
+    "dreamTextLabel": "Dream text",
+    "editDreamText": "Edit dream text",
+    "saving": "Saving…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "extractElements": "Extract elements",
+    "extractDescription": "Dreamer will read your dream and identify its characters, symbols, places, emotions, and actions — without any interpretation.",
+    "extracting": "Extracting…",
+    "reExtract": "Re-extract",
+    "elementCount_one": "{{count}} element",
+    "elementCount_other": "{{count}} elements",
+    "continueHint": "When you're satisfied, continue to add your personal associations.",
+    "continueButton": "Continue to Associations",
+    "errors": {
+      "loadFailed": "Could not load this dream. Please return to the Dashboard and try again.",
+      "extractFailed": "Something went wrong during extraction. Please try again."
+    },
+    "kinds": {
+      "symbol": "Symbols",
+      "character": "Characters",
+      "place": "Places",
+      "emotion": "Emotions",
+      "action": "Actions",
+      "shift": "Shifts"
+    },
+    "actions": {
+      "confirm": "Confirm",
+      "editLabel": "Edit label",
+      "remove": "Remove",
+      "confirmEdit": "Confirm edit",
+      "editElementLabel": "Edit element label",
+      "removeElement": "Remove element",
+      "add": "Add"
+    }
+  },
+
+  "associations": {
+    "step": "Dreamer · Step 3",
+    "title": "Personal Associations",
+    "subtitle": "Each element carries personal meaning. What do these elements mean to you? Capture your associations, emotional tone, and how much each one resonates.",
+    "associationLabel": "Your association",
+    "associationPlaceholder": "Your association or what this means to you",
+    "emotionalTone": "Emotional tone",
+    "valence": {
+      "positive": "Positive",
+      "mixed": "Mixed",
+      "negative": "Negative"
+    },
+    "salience": "Salience (1-5)",
+    "saliencePersonal": "Salience (personal resonance)",
+    "saveAssociation": "Save Association",
+    "saving": "Saving...",
+    "continueHint": "When you have captured your associations, continue to interpretation.",
+    "continueButton": "Continue to Interpretation",
+    "noElements": "No elements found in your dream. Return to Dream Breakdown and ensure elements are extracted before continuing.",
+    "errors": {
+      "loadFailed": "Could not load this dream. Please return to the Dashboard and try again.",
+      "dreamNotFound": "Dream not found",
+      "loadDreamFailed": "Could not load dream. Please try again.",
+      "saveFailed": "Could not save association. Please try again.",
+      "updateFailed": "Could not update association. Please try again.",
+      "deleteFailed": "Could not delete association. Please try again."
+    }
+  },
+
+  "interpretation": {
+    "step": "Dreamer · Step 4",
+    "title": "Interpretation",
+    "subtitle": "Dreamer will generate hypotheses about what your dream might mean, grounded in Jungian psychology. These are possibilities to explore, not conclusions.",
+    "generateTitle": "Generate Hypotheses",
+    "generateDescription": "Based on your dream, elements, and personal associations, Dreamer will generate 2-3 Jungian hypotheses. Take what resonates, leave what doesn't.",
+    "generating": "Generating...",
+    "generateButton": "Generate hypotheses",
+    "reGenerate": "Re-generate",
+    "hypothesesCount_one": "{{count}} hypothesis",
+    "hypothesesCount_other": "{{count}} hypotheses",
+    "continueHint": "When you have explored these hypotheses, continue to integration.",
+    "continueButton": "Continue to Integration",
+    "errors": {
+      "loadFailed": "Could not load this dream. Please return to the Dashboard and try again.",
+      "dreamNotFound": "Dream not found",
+      "loadDreamFailed": "Could not load dream. Please try again.",
+      "generateFailed": "Could not generate hypotheses. Please try again.",
+      "apiError": "API Error: {{message}}",
+      "noApiKey": "No API key found. Please check Settings.",
+      "feedbackFailed": "Could not save feedback. Please try again."
+    }
+  },
+
+  "integration": {
+    "header": "Dreamer",
+    "title": "Integration",
+    "chooseDream": "Choose a dream to continue integration",
+    "chooseDreamDescription": "Select a dream from your history or record a new one to begin integration.",
+    "viewDashboard": "View Dashboard",
+    "recordDream": "Record a Dream",
+    "reflectiveSummary": "Reflective Summary",
+    "reflectiveSummaryDescription": "This is a gentle summary of what has surfaced so far. Let it be a starting point rather than a conclusion.",
+    "reflectiveQuestions": "Reflective Questions",
+    "question1": "What feels most alive or unfinished about this dream right now?",
+    "question2": "What small step could honor the feeling this dream leaves you with?",
+    "practiceSuggestion": "Practice Suggestion",
+    "practiceSuggestionDescription": "Try a small, grounding action that echoes the dream's feeling or image. Keep it gentle and optional.",
+    "journal": "Journal",
+    "journalLabel": "Journal (optional)",
+    "journalPlaceholder": "Write anything that feels worth keeping."
+  },
+
+  "settings": {
+    "header": "Dreamer",
+    "title": "Settings",
+    "language": "Language",
+    "freeTrial": {
+      "title": "Free trial",
+      "dreamsRecorded": "Dreams recorded with shared key",
+      "dreamsRemaining_one": "You have {{count}} free dream remaining. Add your own key below for unlimited access.",
+      "dreamsRemaining_other": "You have {{count}} free dreams remaining. Add your own key below for unlimited access.",
+      "trialEnded": "Your free trial has ended. Add your own API key to keep recording dreams."
+    },
+    "apiKey": {
+      "title": "Your API Key",
+      "description": "Optional — add your own OpenAI-compatible API key for unlimited access. Your key is stored only in this browser and is never sent to our servers.",
+      "keySaved": "Key saved:",
+      "removeKey": "Remove key",
+      "replaceKey": "Replace with a new key:",
+      "enterKey": "Enter your OpenAI-compatible API key:",
+      "label": "API key",
+      "placeholder": "sk-...",
+      "showKey": "Show key",
+      "hideKey": "Hide key",
+      "saveKey": "Save key",
+      "savedLocally": "Key saved locally."
+    },
+    "privacyNote": {
+      "title": "Privacy note:",
+      "body": "Your API key and dream content remain in your browser and your Firestore database. Dreamer never logs dream text or shares it with third parties beyond the AI provider you configure here."
+    }
+  },
+
+  "byokGate": {
+    "freeTrial": "Free trial",
+    "dreamsLeft": "{{remaining}} of {{total}} dreams left",
+    "usingSharedKey": "You're using a shared key.",
+    "addOwnKey": "Add your own API key",
+    "inSettingsForUnlimited": "in Settings for unlimited access.",
+    "trialUsedUp": "Free trial used up",
+    "trialExhausted": "You've used all {{total}} free trial dreams. Add your own OpenAI-compatible API key in Settings to continue.",
+    "goToSettings": "Go to Settings",
+    "addedMyKey": "I've added my key"
+  },
+
+  "hypothesisCard": {
+    "disclaimer": "One possible interpretation, not a conclusion.",
+    "reflectiveQuestion": "Reflective Question",
+    "evidenceReferences": "Evidence References",
+    "resonates": "Resonates",
+    "doesNotFit": "Doesn't fit",
+    "lenses": {
+      "compensation": "Compensation",
+      "shadow": "Shadow",
+      "archetypal_dynamics": "Archetypal Dynamics",
+      "relational_anima_animus": "Anima / Animus",
+      "individuation": "Individuation"
+    },
+    "evidenceTypes": {
+      "dream_text": "Dream Text",
+      "element": "Element",
+      "association": "Association",
+      "default": "Evidence"
+    }
+  },
+
+  "associationCard": {
+    "yourAssociation": "Your association",
+    "emotionalTone": "Emotional tone",
+    "saliencePersonal": "Salience (personal resonance)",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "valence": {
+      "positive": "Positive",
+      "negative": "Negative",
+      "mixed": "Mixed"
+    }
+  },
+
+  "statusBadge": {
+    "draft": "Draft",
+    "structured": "Structured",
+    "associated": "Associated",
+    "interpreted": "Interpreted",
+    "integrated": "Integrated"
+  },
+
+  "dreamListItem": {
+    "mood": "mood: {{mood}}"
+  },
+
+  "placeholders": {
+    "dreamEntry": {
+      "title": "Dream Entry",
+      "description": "We could not start dream entry yet. Please try again in a moment."
+    },
+    "dreamSession": {
+      "title": "Dream Session",
+      "description": "Could not load this dream. Please return to the Dashboard."
+    },
+    "dreamBreakdown": {
+      "title": "Dream Breakdown",
+      "noParam": "No dream selected. Please record a dream first.",
+      "loadFailed": "Could not load this dream. Please return to the Dashboard.",
+      "recordFirst": "Record a dream first, then come back here to structure it."
+    },
+    "associations": {
+      "title": "Associations",
+      "noParam": "No dream selected. Please record a dream first.",
+      "loadFailed": "Could not load this dream. Please return to the Dashboard.",
+      "recordFirst": "Record a dream first, then come back here to add associations."
+    },
+    "interpretation": {
+      "title": "Interpretation",
+      "noParam": "No dream selected. Please record a dream first.",
+      "loadFailed": "Could not load this dream. Please return to the Dashboard.",
+      "recordFirst": "Record a dream first, then come back here to review hypotheses."
+    }
+  },
+
+  "about": {
+    "title": "Dreamer",
+    "subtitle": "A tool for Jungian dreamwork and inner reflection",
+    "start": "Start →",
+    "disclaimer": "This project is intended for personal reflection and educational exploration. It is not a substitute for psychotherapy or professional mental health care.",
+    "jung": {
+      "heading": "What is Jungian Dreamwork?",
+      "p1": "Carl Jung believed that dreams are not random noise, but meaningful communications from the unconscious psyche. Where Freud focused on repressed wishes, Jung saw dreams as compensatory messages — the unconscious showing us what our waking mind overlooks, neglects, or cannot yet integrate.",
+      "p2": "Central to Jung's framework are a few core ideas. The <accent>shadow</accent> holds qualities we deny in ourselves — both dark and light. The <accent>anima / animus</accent> represents the contrasexual inner figure that mediates between the ego and the deeper unconscious. The <accent>Self</accent> is the organising centre of the whole psyche, often appearing in dreams as a figure of authority, a wise elder, or a numinous symbol. Through dreamwork, we begin to recognise these figures not as strangers, but as parts of ourselves seeking acknowledgement.",
+      "p3": "Jung's method of <accent>amplification</accent> asks the dreamer to circle a symbol outward — associating it with personal memories, cultural parallels, and archetypal themes — rather than reducing it to a single fixed meaning. The goal is not a definitive answer but a richer dialogue with the unconscious."
+    },
+    "innerWork": {
+      "heading": "Robert A. Johnson's <em>Inner Work</em>",
+      "p1": "Analyst Robert A. Johnson distilled Jung's approach into a four-step practice in his book <em>Inner Work</em>. First, gather your <accent>associations</accent> — what does each image bring to mind from your own life? Second, <accent>connect the dream to your inner life</accent> — treat every figure as an aspect of your own psyche rather than as a commentary on other people. Third, interpret — form tentative <accent>hypotheses</accent> and hold them lightly. Fourth, make the insight <accent>concrete</accent> through a small ritual or lived act that honours what the dream asked of you.",
+      "p2": "Johnson insists that interpretations are always provisional. No symbol has a fixed universal meaning. The dreamer's own associations come first, and the most valuable dreamwork ends not in a clever reading but in a modest, embodied change."
+    },
+    "howItWorks": {
+      "heading": "How This App Works",
+      "intro": "Dreamer walks you through Johnson's four steps as a structured session:",
+      "steps": {
+        "record": {
+          "title": "Record",
+          "description": "Write your dream in free text. The app parses it into characters, symbols, settings, emotions, and narrative shifts so nothing gets lost."
+        },
+        "associate": {
+          "title": "Associate",
+          "description": "For each element, you supply your own personal associations. The app never overrides these with dictionary definitions."
+        },
+        "interpret": {
+          "title": "Interpret",
+          "description": "Using your dream and associations, the AI generates several clearly labelled hypotheses — compensation, shadow, anima/animus, archetypal, and individuation. Each is a question to sit with, not a verdict."
+        },
+        "integrate": {
+          "title": "Integrate",
+          "description": "The app suggests a small, concrete act to bring the dream's insight into waking life — in the spirit of Johnson's ritual step."
+        }
+      },
+      "footnote": "All interpretations are framed as hypotheses. Your associations take precedence over any AI suggestion. The app is designed for personal reflection — it makes no diagnostic or therapeutic claims, and your data stays private."
+    }
+  }
+}

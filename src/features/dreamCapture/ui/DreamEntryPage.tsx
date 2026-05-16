@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Firestore } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Box,
@@ -60,6 +61,7 @@ export default function DreamEntryPage({
   onContinue,
   deps,
 }: DreamEntryPageProps) {
+  const { t } = useTranslation();
   const [rawText, setRawText] = useState("");
   const [mood, setMood] = useState("");
   const [lifeContext, setLifeContext] = useState("");
@@ -181,7 +183,7 @@ export default function DreamEntryPage({
 
     const apiKey = services.getApiKey();
     if (!apiKey) {
-      setVoiceError("No API key found. Please add your OpenAI key in Settings.");
+      setVoiceError(t("dreamEntry.errors.noApiKey"));
       return;
     }
 
@@ -189,7 +191,7 @@ export default function DreamEntryPage({
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch {
-      setVoiceError("Microphone access denied. Please allow microphone and try again.");
+      setVoiceError(t("dreamEntry.errors.microphoneDenied"));
       return;
     }
 
@@ -227,7 +229,7 @@ export default function DreamEntryPage({
           });
         }
       } catch (err) {
-        setVoiceError(err instanceof Error ? err.message : "Transcription failed.");
+        setVoiceError(err instanceof Error ? err.message : t("dreamEntry.voiceTranscribing"));
       } finally {
         setIsTranscribing(false);
       }
@@ -254,10 +256,10 @@ export default function DreamEntryPage({
   }, []);
 
   const voiceButtonLabel = isTranscribing
-    ? "Transcribing…"
+    ? t("dreamEntry.voiceTranscribing")
     : isVoiceRecording
-      ? "Stop recording"
-      : "Start voice recording";
+      ? t("dreamEntry.voiceStop")
+      : t("dreamEntry.voiceStart");
 
   const voiceButtonDisabled = isTranscribing;
 
@@ -279,20 +281,20 @@ export default function DreamEntryPage({
               variant="overline"
               sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dreamer · Step 1
+              {t("dreamEntry.step")}
             </Typography>
             <Typography
               variant="h4"
               component="h1"
               sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
-              Record your dream
+              {t("dreamEntry.title")}
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 520 }}
             >
-              Capture your dream as you remember it — no detail is too small.
+              {t("dreamEntry.subtitle")}
             </Typography>
           </Stack>
 
@@ -300,8 +302,8 @@ export default function DreamEntryPage({
           <TextField
             id="dream-text"
             name="dreamText"
-            label="Dream"
-            placeholder="Write your dream as you remember it..."
+            label={t("dreamEntry.dreamLabel")}
+            placeholder={t("dreamEntry.dreamPlaceholder")}
             multiline
             minRows={8}
             value={rawText}
@@ -322,10 +324,10 @@ export default function DreamEntryPage({
             </Button>
             <Typography variant="body2" sx={{ color: "var(--color-text-secondary, #94a3b8)" }}>
               {isVoiceRecording
-                ? "Записую… Натисніть «Stop recording» коли закінчите."
+                ? t("dreamEntry.voiceActiveHint")
                 : isTranscribing
-                  ? "Розпізнаю мову через Whisper…"
-                  : "Говоріть українською — Whisper розпізнає і додасть текст."}
+                  ? t("dreamEntry.voiceTranscribingHint")
+                  : t("dreamEntry.voiceRecordingHint")}
             </Typography>
           </Stack>
 
@@ -339,8 +341,8 @@ export default function DreamEntryPage({
           <TextField
             id="dream-mood"
             name="mood"
-            label="Waking mood (optional)"
-            placeholder="e.g. anxious, peaceful, curious..."
+            label={t("dreamEntry.moodLabel")}
+            placeholder={t("dreamEntry.moodPlaceholder")}
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             onBlur={handleBlur}
@@ -351,8 +353,8 @@ export default function DreamEntryPage({
           <TextField
             id="dream-context"
             name="lifeContext"
-            label="Life context (optional)"
-            placeholder="What's been on your mind lately?"
+            label={t("dreamEntry.lifeContextLabel")}
+            placeholder={t("dreamEntry.lifeContextPlaceholder")}
             multiline
             minRows={4}
             value={lifeContext}
@@ -371,7 +373,7 @@ export default function DreamEntryPage({
               onClick={handleContinue}
               sx={{ minWidth: 160 }}
             >
-              Continue
+              {t("dreamEntry.continue")}
             </Button>
           </Stack>
         </Stack>

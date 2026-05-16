@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Firestore } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Box,
@@ -62,10 +63,11 @@ function SalienceInput({
   value: number;
   onChange?: (newValue: number) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Stack spacing={0.5}>
       <Typography variant="caption" sx={{ color: "var(--color-text-muted, #64748b)" }}>
-        Salience (1-5)
+        {t("associations.salience")}
       </Typography>
       <Box sx={{ display: "flex", gap: 1 }}>
         {[1, 2, 3, 4, 5].map((num) => (
@@ -100,6 +102,7 @@ export default function AssociationsPage({
   dreamId,
   onContinue,
 }: AssociationsPageProps) {
+  const { t } = useTranslation();
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [elements, setElements] = useState<Array<{ id: ElementId; data: DreamElementDoc }>>([]);
   const [associationMap, setAssociationMap] = useState<LocalAssociationMap>({});
@@ -127,7 +130,7 @@ export default function AssociationsPage({
         ]);
 
         if (!dreamDoc) {
-          setError("Dream not found");
+          setError(t("associations.errors.dreamNotFound"));
           setPageStatus("error");
           return;
         }
@@ -155,7 +158,7 @@ export default function AssociationsPage({
         setPageStatus("ready");
       } catch (err) {
         console.error("Failed to load associations page:", err);
-        setError("Could not load dream. Please try again.");
+        setError(t("associations.errors.loadDreamFailed"));
         setPageStatus("error");
       }
     };
@@ -193,7 +196,7 @@ export default function AssociationsPage({
         }));
       } catch (err) {
         console.error("Failed to create association:", err);
-        setError("Could not save association. Please try again.");
+        setError(t("associations.errors.saveFailed"));
       } finally {
         setSavingId(null);
       }
@@ -233,7 +236,7 @@ export default function AssociationsPage({
         });
       } catch (err) {
         console.error("Failed to update association:", err);
-        setError("Could not update association. Please try again.");
+        setError(t("associations.errors.updateFailed"));
       } finally {
         setSavingId(null);
       }
@@ -254,7 +257,7 @@ export default function AssociationsPage({
         });
       } catch (err) {
         console.error("Failed to delete association:", err);
-        setError("Could not delete association. Please try again.");
+        setError(t("associations.errors.deleteFailed"));
       } finally {
         setSavingId(null);
       }
@@ -277,22 +280,20 @@ export default function AssociationsPage({
               variant="overline"
               sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dreamer - Step 3
+              {t("associations.step")}
             </Typography>
             <Typography
               variant="h4"
               component="h1"
               sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
-              Personal Associations
+              {t("associations.title")}
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 560 }}
             >
-              Each element carries personal meaning. What do these elements mean to
-              you? Capture your associations, emotional tone, and how much each one
-              resonates.
+              {t("associations.subtitle")}
             </Typography>
           </Stack>
 
@@ -306,7 +307,7 @@ export default function AssociationsPage({
 
           {pageStatus === "error" && (
             <Alert severity="error">
-              {error || "Could not load this dream. Please return to the Dashboard and try again."}
+              {error || t("associations.errors.loadFailed")}
             </Alert>
           )}
 
@@ -314,8 +315,7 @@ export default function AssociationsPage({
             <>
               {elements.length === 0 && (
                 <Alert severity="info">
-                  No elements found in your dream. Return to Dream Breakdown and ensure
-                  elements are extracted before continuing.
+                  {t("associations.noElements")}
                 </Alert>
               )}
 
@@ -353,8 +353,8 @@ export default function AssociationsPage({
                             <TextField
                               multiline
                               minRows={3}
-                              placeholder="Your association or what this means to you"
-                              label="Your association"
+                              placeholder={t("associations.associationPlaceholder")}
+                              label={t("associations.associationLabel")}
                               value={form?.text || ""}
                               onChange={(e) =>
                                 setFormState((prev) => ({
@@ -387,7 +387,7 @@ export default function AssociationsPage({
                                 variant="caption"
                                 sx={{ color: "var(--color-text-muted, #64748b)", display: "block", mb: 0.75 }}
                               >
-                                Emotional tone
+                                {t("associations.emotionalTone")}
                               </Typography>
                               <ToggleButtonGroup
                                 exclusive
@@ -419,7 +419,7 @@ export default function AssociationsPage({
                                       },
                                     }}
                                   >
-                                    {val === "positive" ? "Positive" : val === "negative" ? "Negative" : "Mixed"}
+                                    {t(`associations.valence.${val}`)}
                                   </ToggleButton>
                                 ))}
                               </ToggleButtonGroup>
@@ -445,7 +445,7 @@ export default function AssociationsPage({
                               disabled={isSaving || !form?.text.trim()}
                               startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
                             >
-                              {isSaving ? "Saving..." : "Save Association"}
+                              {isSaving ? t("associations.saving") : t("associations.saveAssociation")}
                             </Button>
                           </Stack>
                         )}
@@ -468,7 +468,7 @@ export default function AssociationsPage({
                       variant="body2"
                       sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
-                      When you have captured your associations, continue to interpretation.
+                      {t("associations.continueHint")}
                     </Typography>
                     <Button
                       variant="contained"
@@ -476,7 +476,7 @@ export default function AssociationsPage({
                       onClick={() => onContinue?.(dreamId)}
                       sx={{ whiteSpace: "nowrap" }}
                     >
-                      Continue to Interpretation
+                      {t("associations.continueButton")}
                     </Button>
                   </Stack>
                 </>

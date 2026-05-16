@@ -1,4 +1,5 @@
 import { Box, Card, CardActionArea, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import StatusBadge from "../../../shared/ui/StatusBadge";
 import type { DreamDoc, DreamId } from "../model/types";
 
@@ -9,9 +10,9 @@ interface DreamListItemProps {
 
 const MAX_EXCERPT_LENGTH = 120;
 
-function formatDreamDate(timestamp: { toDate: () => Date }): string {
+function formatDreamDate(timestamp: { toDate: () => Date }, locale: string): string {
   const date = timestamp.toDate();
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -24,9 +25,10 @@ function truncateText(text: string, maxLength: number): string {
 }
 
 export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
+  const { t, i18n } = useTranslation();
   const { id, data } = dream;
   const excerpt = truncateText(data.rawText, MAX_EXCERPT_LENGTH);
-  const dateStr = formatDreamDate(data.dreamedAt);
+  const dateStr = formatDreamDate(data.dreamedAt, i18n.language);
 
   return (
     <Card
@@ -76,7 +78,7 @@ export default function DreamListItem({ dream, onClick }: DreamListItemProps) {
                   fontFamily: '"JetBrains Mono", monospace',
                 }}
               >
-                mood: {data.mood}
+                {t("dreamListItem.mood", { mood: data.mood })}
               </Typography>
             )}
           </Stack>

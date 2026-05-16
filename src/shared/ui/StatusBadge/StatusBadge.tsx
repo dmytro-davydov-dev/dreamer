@@ -1,17 +1,10 @@
 import { Chip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { DreamStatus } from "../../types/domain";
 
 interface StatusBadgeProps {
   status: DreamStatus;
 }
-
-const statusLabels: Record<DreamStatus, string> = {
-  draft: "Draft",
-  structured: "Structured",
-  associated: "Associated",
-  interpreted: "Interpreted",
-  integrated: "Integrated",
-};
 
 const statusStyles: Record<
   DreamStatus,
@@ -45,10 +38,11 @@ const statusStyles: Record<
 };
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
+  const { t } = useTranslation();
   const style = statusStyles[status];
   return (
     <Chip
-      label={statusLabels[status]}
+      label={t(`statusBadge.${status}`)}
       size="small"
       sx={{
         height: "22px",

@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./app/i18n";
 import App from "./app/App";
 import "./app/styles/base.css";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";

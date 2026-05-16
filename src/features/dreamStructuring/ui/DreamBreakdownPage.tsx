@@ -20,6 +20,7 @@ import {
 } from "react";
 import type { Firestore } from "firebase/firestore";
 import { doc, collection } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Box,
@@ -90,13 +91,13 @@ const KIND_ORDER: ElementKind[] = [
   "shift",
 ];
 
-const KIND_LABELS: Record<ElementKind, string> = {
-  symbol: "Symbols",
-  character: "Characters",
-  place: "Places",
-  emotion: "Emotions",
-  action: "Actions",
-  shift: "Shifts",
+const KIND_LABEL_KEYS: Record<ElementKind, string> = {
+  symbol: "dreamBreakdown.kinds.symbol",
+  character: "dreamBreakdown.kinds.character",
+  place: "dreamBreakdown.kinds.place",
+  emotion: "dreamBreakdown.kinds.emotion",
+  action: "dreamBreakdown.kinds.action",
+  shift: "dreamBreakdown.kinds.shift",
 };
 
 const KIND_COLORS: Record<ElementKind, string> = {
@@ -113,7 +114,7 @@ const KIND_COLORS: Record<ElementKind, string> = {
 function KindChip({ kind }: { kind: ElementKind }) {
   return (
     <Chip
-      label={kind}
+      label={kind.toUpperCase()}
       size="small"
       sx={{
         fontSize: "10px",
@@ -134,6 +135,7 @@ interface ElementCardProps {
 }
 
 function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(element.data.label);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -224,27 +226,27 @@ function ElementCard({ element, onLabelChange, onDelete }: ElementCardProps) {
         sx={{ opacity: { xs: 1, sm: 0 }, transition: "opacity 0.15s" }}
       >
         {editing ? (
-          <Tooltip title="Confirm">
-            <IconButton size="small" onClick={commitEdit} aria-label="Confirm edit">
+          <Tooltip title={t("dreamBreakdown.actions.confirm")}>
+            <IconButton size="small" onClick={commitEdit} aria-label={t("dreamBreakdown.actions.confirmEdit")}>
               <CheckIcon fontSize="small" sx={{ color: "var(--color-accent-primary, #00d4ff)" }} />
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title="Edit label">
+          <Tooltip title={t("dreamBreakdown.actions.editLabel")}>
             <IconButton
               size="small"
               onClick={() => setEditing(true)}
-              aria-label="Edit element label"
+              aria-label={t("dreamBreakdown.actions.editElementLabel")}
             >
               <EditIcon fontSize="small" sx={{ color: "var(--color-text-secondary, #94a3b8)" }} />
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title="Remove">
+        <Tooltip title={t("dreamBreakdown.actions.remove")}>
           <IconButton
             size="small"
             onClick={() => onDelete(element.id)}
-            aria-label="Remove element"
+            aria-label={t("dreamBreakdown.actions.removeElement")}
           >
             <DeleteOutlineIcon
               fontSize="small"
@@ -263,6 +265,7 @@ interface AddElementRowProps {
 }
 
 function AddElementRow({ kind, onAdd }: AddElementRowProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -280,6 +283,8 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
     setOpen(false);
   };
 
+  const kindLabel = t(KIND_LABEL_KEYS[kind]).toLowerCase().replace(/s$/, "");
+
   if (!open) {
     return (
       <Button
@@ -295,7 +300,7 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
           "&:hover": { color: "var(--color-accent-primary, #00d4ff)" },
         }}
       >
-        Add {KIND_LABELS[kind].toLowerCase().replace(/s$/, "")}
+        {t("dreamBreakdown.actions.add")} {kindLabel}
       </Button>
     );
   }
@@ -305,7 +310,7 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
       <TextField
         inputRef={inputRef}
         size="small"
-        placeholder={`New ${kind}…`}
+        placeholder={`${kindLabel}…`}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={commit}
@@ -325,7 +330,7 @@ function AddElementRow({ kind, onAdd }: AddElementRowProps) {
         }}
       />
       <Button size="small" onClick={commit} sx={{ minWidth: 0 }}>
-        Add
+        {t("dreamBreakdown.actions.add")}
       </Button>
     </Stack>
   );
@@ -346,6 +351,7 @@ export default function DreamBreakdownPage({
   dreamId,
   onContinue,
 }: DreamBreakdownPageProps) {
+  const { t } = useTranslation();
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [dream, setDream] = useState<DreamDoc | null>(null);
   const [elements, setElements] = useState<LocalElement[]>([]);
@@ -414,7 +420,7 @@ export default function DreamBreakdownPage({
       const msg =
         err instanceof LlmError
           ? err.message
-          : "Something went wrong during extraction. Please try again.";
+          : t("dreamBreakdown.errors.extractFailed");
       setExtractError(msg);
       setPageStatus("ready");
     }
@@ -544,22 +550,20 @@ export default function DreamBreakdownPage({
               variant="overline"
               sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dreamer · Step 2
+              {t("dreamBreakdown.step")}
             </Typography>
             <Typography
               variant="h4"
               component="h1"
               sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
             >
-              Dream Breakdown
+              {t("dreamBreakdown.title")}
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "var(--color-text-secondary, #94a3b8)", maxWidth: 560 }}
             >
-              These are the elements Dreamer found in your dream. Edit, remove, or
-              add anything that feels more accurate — your sense of the dream is
-              always primary.
+              {t("dreamBreakdown.subtitle")}
             </Typography>
           </Stack>
 
@@ -575,8 +579,7 @@ export default function DreamBreakdownPage({
           {/* Error state */}
           {pageStatus === "error" && (
             <Alert severity="error">
-              Could not load this dream. Please return to the Dashboard and try
-              again.
+              {t("dreamBreakdown.errors.loadFailed")}
             </Alert>
           )}
 
@@ -609,14 +612,14 @@ export default function DreamBreakdownPage({
                         letterSpacing: "0.08em",
                       }}
                     >
-                      Dream text
+                      {t("dreamBreakdown.dreamTextLabel")}
                     </Typography>
                     {!editingDreamText && (
-                      <Tooltip title="Edit dream text">
+                      <Tooltip title={t("dreamBreakdown.editDreamText")}>
                         <IconButton
                           size="small"
                           onClick={handleEditDreamText}
-                          aria-label="Edit dream text"
+                          aria-label={t("dreamBreakdown.editDreamText")}
                           sx={{ mr: -0.5 }}
                         >
                           <EditIcon
@@ -654,7 +657,7 @@ export default function DreamBreakdownPage({
                           disabled={savingDreamText || !dreamTextValue.trim()}
                           sx={{ textTransform: "none", fontSize: "12px" }}
                         >
-                          {savingDreamText ? "Saving…" : "Save"}
+                          {savingDreamText ? t("dreamBreakdown.saving") : t("dreamBreakdown.save")}
                         </Button>
                         <Button
                           size="small"
@@ -666,7 +669,7 @@ export default function DreamBreakdownPage({
                             fontSize: "12px",
                           }}
                         >
-                          Cancel
+                          {t("dreamBreakdown.cancel")}
                         </Button>
                       </Stack>
                     </Stack>
@@ -704,15 +707,13 @@ export default function DreamBreakdownPage({
                       component="h2"
                       sx={{ color: "var(--color-text-primary, #e2e8f0)" }}
                     >
-                      Extract elements
+                      {t("dreamBreakdown.extractElements")}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ color: "var(--color-text-secondary, #94a3b8)" }}
                     >
-                      Dreamer will read your dream and identify its characters,
-                      symbols, places, emotions, and actions — without any
-                      interpretation.
+                      {t("dreamBreakdown.extractDescription")}
                     </Typography>
 
                     {getEffectiveLlmApiKey() ? (
@@ -732,8 +733,8 @@ export default function DreamBreakdownPage({
                           sx={{ alignSelf: "flex-start" }}
                         >
                           {pageStatus === "extracting"
-                            ? "Extracting…"
-                            : "Extract elements"}
+                            ? t("dreamBreakdown.extracting")
+                            : t("dreamBreakdown.extractElements")}
                         </Button>
                         {extractError && (
                           <Alert severity="error">{extractError}</Alert>
@@ -755,7 +756,7 @@ export default function DreamBreakdownPage({
                       variant="body2"
                       sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
-                      {elements.filter((e) => !e.data.deleted).length} elements
+                      {t("dreamBreakdown.elementCount", { count: elements.filter((e) => !e.data.deleted).length })}
                     </Typography>
                     {getEffectiveLlmApiKey() && (
                       <Button
@@ -776,7 +777,7 @@ export default function DreamBreakdownPage({
                           fontSize: "12px",
                         }}
                       >
-                        Re-extract
+                        {t("dreamBreakdown.reExtract")}
                       </Button>
                     )}
                     {extractError && (
@@ -805,7 +806,7 @@ export default function DreamBreakdownPage({
                             mb: 1,
                           }}
                         >
-                          {KIND_LABELS[kind]}
+                          {t(KIND_LABEL_KEYS[kind])}
                         </Typography>
                         <Stack spacing={1}>
                           {group.map((el) => (
@@ -840,8 +841,7 @@ export default function DreamBreakdownPage({
                       variant="body2"
                       sx={{ color: "var(--color-text-muted, #64748b)" }}
                     >
-                      When you're satisfied, continue to add your personal
-                      associations.
+                      {t("dreamBreakdown.continueHint")}
                     </Typography>
                     <Button
                       variant="contained"
@@ -849,7 +849,7 @@ export default function DreamBreakdownPage({
                       onClick={() => onContinue?.(dreamId)}
                       sx={{ whiteSpace: "nowrap" }}
                     >
-                      Continue to Associations
+                      {t("dreamBreakdown.continueButton")}
                     </Button>
                   </Stack>
                 </>

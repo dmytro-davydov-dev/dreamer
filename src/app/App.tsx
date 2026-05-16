@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router";
 import type { Firestore } from "firebase/firestore";
 import { onAuthStateChanged, type User } from "firebase/auth";
@@ -71,6 +72,7 @@ function PlaceholderPage({ title, description }: { title: string; description: s
 
 
 function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId) => void }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [state, setState] = useState<{
     status: "loading" | "ready" | "error";
@@ -118,8 +120,8 @@ function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId)
   if (state.status === "error" || !state.db || !state.uid) {
     return (
       <PlaceholderPage
-        title="Dream Entry"
-        description="We could not start dream entry yet. Please try again in a moment."
+        title={t("placeholders.dreamEntry.title")}
+        description={t("placeholders.dreamEntry.description")}
       />
     );
   }
@@ -137,6 +139,7 @@ function DreamEntryScreen({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId)
 }
 
 function DreamSessionRoute({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId) => void }) {
+  const { t } = useTranslation();
   const { dreamId } = useParams();
   const navigate = useNavigate();
 
@@ -179,8 +182,8 @@ function DreamSessionRoute({ onDreamSelect }: { onDreamSelect: (dreamId: DreamId
   if (state.status === "error" || !state.db || !state.uid || !dreamId) {
     return (
       <PlaceholderPage
-        title="Dream Session"
-        description="Could not load this dream. Please return to the Dashboard."
+        title={t("placeholders.dreamSession.title")}
+        description={t("placeholders.dreamSession.description")}
       />
     );
   }
@@ -215,6 +218,7 @@ function DreamBreakdownLoader({
   dreamId: DreamId;
   onContinue?: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<{
     status: "loading" | "ready" | "error";
     db: Firestore | null;
@@ -250,8 +254,8 @@ function DreamBreakdownLoader({
   if (state.status === "error" || !state.db || !state.uid) {
     return (
       <PlaceholderPage
-        title="Dream Breakdown"
-        description="Could not load this dream. Please return to the Dashboard."
+        title={t("placeholders.dreamBreakdown.title")}
+        description={t("placeholders.dreamBreakdown.loadFailed")}
       />
     );
   }
@@ -290,6 +294,7 @@ function DreamBreakdownRouteByParam({
 }: {
   onDreamSelect: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const { dreamId } = useParams();
   const navigate = useNavigate();
 
@@ -300,8 +305,8 @@ function DreamBreakdownRouteByParam({
   if (!dreamId) {
     return (
       <PlaceholderPage
-        title="Dream Breakdown"
-        description="No dream selected. Please record a dream first."
+        title={t("placeholders.dreamBreakdown.title")}
+        description={t("placeholders.dreamBreakdown.noParam")}
       />
     );
   }
@@ -325,6 +330,7 @@ function AssociationsLoader({
   dreamId: DreamId;
   onContinue?: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<{
     status: "loading" | "ready" | "error";
     db: Firestore | null;
@@ -360,8 +366,8 @@ function AssociationsLoader({
   if (state.status === "error" || !state.db || !state.uid) {
     return (
       <PlaceholderPage
-        title="Associations"
-        description="Could not load this dream. Please return to the Dashboard."
+        title={t("placeholders.associations.title")}
+        description={t("placeholders.associations.loadFailed")}
       />
     );
   }
@@ -381,6 +387,7 @@ function AssociationsRouteByParam({
 }: {
   onDreamSelect: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const { dreamId } = useParams();
   const navigate = useNavigate();
 
@@ -391,8 +398,8 @@ function AssociationsRouteByParam({
   if (!dreamId) {
     return (
       <PlaceholderPage
-        title="Associations"
-        description="No dream selected. Please record a dream first."
+        title={t("placeholders.associations.title")}
+        description={t("placeholders.associations.noParam")}
       />
     );
   }
@@ -416,6 +423,7 @@ function InterpretationLoader({
   dreamId: DreamId;
   onContinue?: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<{
     status: "loading" | "ready" | "error";
     db: Firestore | null;
@@ -451,8 +459,8 @@ function InterpretationLoader({
   if (state.status === "error" || !state.db || !state.uid) {
     return (
       <PlaceholderPage
-        title="Interpretation"
-        description="Could not load this dream. Please return to the Dashboard."
+        title={t("placeholders.interpretation.title")}
+        description={t("placeholders.interpretation.loadFailed")}
       />
     );
   }
@@ -472,6 +480,7 @@ function InterpretationRouteByParam({
 }: {
   onDreamSelect: (id: DreamId) => void;
 }) {
+  const { t } = useTranslation();
   const { dreamId } = useParams();
   const navigate = useNavigate();
 
@@ -482,8 +491,8 @@ function InterpretationRouteByParam({
   if (!dreamId) {
     return (
       <PlaceholderPage
-        title="Interpretation"
-        description="No dream selected. Please record a dream first."
+        title={t("placeholders.interpretation.title")}
+        description={t("placeholders.interpretation.noParam")}
       />
     );
   }
@@ -500,6 +509,7 @@ function InterpretationRouteByParam({
 }
 
 function AppShell() {
+  const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeDreamId, setActiveDreamId] = useState<DreamId | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null | undefined>(undefined);
@@ -537,22 +547,22 @@ function AppShell() {
 
   const navItems = useMemo<NavItem[]>(
     () => [
-      { label: "Dashboard", path: "/dashboard" },
-      { label: "Record a Dream", path: "/dreams/new" },
+      { label: t("nav.dashboard"), path: "/dashboard" },
+      { label: t("nav.recordDream"), path: "/dreams/new" },
       {
-        label: "Dream Breakdown",
+        label: t("nav.dreamBreakdown"),
         path: activeDreamId ? `/dreams/${activeDreamId}/breakdown` : "/dreams/breakdown",
       },
-      { label: "Associations", path: "/dreams/associations" },
-      { label: "Interpretation", path: "/dreams/interpretation" },
+      { label: t("nav.associations"), path: "/dreams/associations" },
+      { label: t("nav.interpretation"), path: "/dreams/interpretation" },
       {
-        label: "Integration",
+        label: t("nav.integration"),
         path: activeDreamId ? `/dreams/${activeDreamId}/integration` : "/dreams/integration",
       },
-      { label: "Settings", path: "/settings" },
-      { label: "About", path: "/about" },
+      { label: t("nav.settings"), path: "/settings" },
+      { label: t("nav.about"), path: "/about" },
     ],
-    [activeDreamId]
+    [activeDreamId, t]
   );
 
   const visibleNavItems = navItems.filter(
@@ -577,7 +587,7 @@ function AppShell() {
           <IconButton
             edge="start"
             color="inherit"
-            aria-label="Open menu"
+            aria-label={t("nav.openMenu")}
             onClick={() => setDrawerOpen(true)}
             sx={{ mr: 2, "&:hover": { backgroundColor: "rgba(0, 212, 255, 0.08)" } }}
           >
@@ -596,14 +606,14 @@ function AppShell() {
               backgroundClip: "text",
             }}
           >
-            Dreamer
+            {t("appName")}
           </Typography>
 
           {/* User info + auth button */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             {currentUser !== undefined && (
               <Tooltip
-                title={currentUser?.isAnonymous ? "Guest session" : (currentUser?.email ?? "")}
+                title={currentUser?.isAnonymous ? t("auth.guestSession") : (currentUser?.email ?? "")}
                 placement="bottom-end"
               >
                 <Typography
@@ -620,7 +630,7 @@ function AppShell() {
                   }}
                 >
                   {currentUser?.isAnonymous || !currentUser
-                    ? "Anonymous"
+                    ? t("auth.anonymous")
                     : currentUser.email}
                 </Typography>
               </Tooltip>
@@ -645,7 +655,7 @@ function AppShell() {
                     },
                   }}
                 >
-                  Sign Out
+                  {t("auth.signOut")}
                 </Button>
               ) : (
                 <Button
@@ -665,7 +675,7 @@ function AppShell() {
                     },
                   }}
                 >
-                  Sign In
+                  {t("auth.signIn")}
                 </Button>
               )
             )}
@@ -748,8 +758,8 @@ function AppShell() {
               />
             ) : (
               <PlaceholderPage
-                title="Dream Breakdown"
-                description="Record a dream first, then come back here to structure it."
+                title={t("placeholders.dreamBreakdown.title")}
+                description={t("placeholders.dreamBreakdown.recordFirst")}
               />
             )
           }
@@ -766,8 +776,8 @@ function AppShell() {
               />
             ) : (
               <PlaceholderPage
-                title="Associations"
-                description="Record a dream first, then come back here to add associations."
+                title={t("placeholders.associations.title")}
+                description={t("placeholders.associations.recordFirst")}
               />
             )
           }
@@ -792,8 +802,8 @@ function AppShell() {
               />
             ) : (
               <PlaceholderPage
-                title="Interpretation"
-                description="Record a dream first, then come back here to review hypotheses."
+                title={t("placeholders.interpretation.title")}
+                description={t("placeholders.interpretation.recordFirst")}
               />
             )
           }

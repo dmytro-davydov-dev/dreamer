@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -23,6 +24,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
   const [dreams, setDreams] = useState<Array<{ id: DreamId; data: DreamDoc }>>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const sessionFiredRef = useRef(false);
 
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
               variant="overline"
               sx={{ color: "var(--color-text-muted, #64748b)" }}
             >
-              Dream Journal
+              {t("dashboard.dreamJournal")}
             </Typography>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography
@@ -141,7 +143,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
                 component="h1"
                 sx={{ color: "var(--color-text-primary, #e2e8f0)", fontWeight: 700 }}
               >
-                Dream History
+                {t("dashboard.dreamHistory")}
               </Typography>
               <Button
                 variant="contained"
@@ -149,7 +151,7 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
                 startIcon={<AddIcon />}
                 onClick={handleRecordDream}
               >
-                Record a Dream
+                {t("dashboard.recordDream")}
               </Button>
             </Stack>
           </Stack>
@@ -169,16 +171,16 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
                 variant="h6"
                 sx={{ color: "var(--color-text-secondary, #94a3b8)", mb: 1.5, fontWeight: 500 }}
               >
-                No dreams yet
+                {t("dashboard.noDreamsYet")}
               </Typography>
               <Typography
                 variant="body2"
                 sx={{ color: "var(--color-text-muted, #64748b)", mb: 4, maxWidth: 360, mx: "auto" }}
               >
-                Start your dreamwork journey by recording your first dream
+                {t("dashboard.startJourneyPrompt")}
               </Typography>
               <Button variant="outlined" color="primary" onClick={handleRecordDream}>
-                Get Started
+                {t("dashboard.getStarted")}
               </Button>
             </Box>
           ) : (
