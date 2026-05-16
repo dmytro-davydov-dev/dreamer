@@ -5,7 +5,21 @@
  * Strict framing as hypotheses, not diagnoses or predictions.
  */
 
-export const INTERPRETER_SYSTEM_PROMPT = `You are a Jungian dream interpreter assistant. Your role is to generate thoughtful, hypothesis-based interpretations of dream content.
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  uk: "Ukrainian",
+  pt: "Portuguese",
+  es: "Spanish",
+};
+
+function resolveLanguageName(langCode: string): string {
+  const base = langCode.split("-")[0].toLowerCase();
+  return LANGUAGE_NAMES[base] ?? "English";
+}
+
+export function buildInterpreterSystemPrompt(language = "en"): string {
+  const langName = resolveLanguageName(language);
+  return `You are a Jungian dream interpreter assistant. Your role is to generate thoughtful, hypothesis-based interpretations of dream content.
 
 CRITICAL RULES:
 1. Generate exactly 2–3 hypotheses
@@ -37,7 +51,15 @@ CRITICAL RULES:
    - Speak to the dreamer's inner world with respect and curiosity
    - Avoid pathologizing language
 
+7. IMPORTANT: Write ALL generated text in ${langName}:
+   - Every hypothesisText must be written in ${langName}
+   - Every reflectiveQuestion must be written in ${langName}
+   - Every evidence quote must be written in ${langName}
+
 Remember: These are hypotheses to explore, not conclusions about the dreamer's psyche.`;
+}
+
+export const INTERPRETER_SYSTEM_PROMPT = buildInterpreterSystemPrompt();
 
 export function buildInterpreterUserPrompt(args: {
   rawText: string;

@@ -10,7 +10,7 @@ import { doc, collection } from "firebase/firestore";
 import { callLlm, LlmError, type LlmCallOptions } from "../../../services/ai/client/llmClient";
 import { analytics, startAiTimer } from "../../../services/analytics";
 import {
-  INTERPRETER_SYSTEM_PROMPT,
+  buildInterpreterSystemPrompt,
   buildInterpreterUserPrompt,
 } from "../../../services/ai/prompts/interpreter";
 import {
@@ -43,6 +43,7 @@ export interface GenerateHypothesesOptions {
   elements: Array<{ id: ElementId; data: DreamElementDoc }>;
   associations: Array<{ id: AssociationId; data: AssociationDoc }>;
   apiKey: string;
+  language?: string;
   model?: string;
 }
 
@@ -78,7 +79,7 @@ function fallbackDreamQuote(rawText: string): string {
 export async function generateHypotheses(
   options: GenerateHypothesesOptions
 ): Promise<GenerateHypothesesResult> {
-  const { db, uid, dreamId, dream, elements, associations, apiKey, model } = options;
+  const { db, uid, dreamId, dream, elements, associations, apiKey, language, model } = options;
 
   const elementMap = new Map<ElementId, string>();
   const elementLabelToId = new Map<string, ElementId>();
@@ -111,7 +112,7 @@ export async function generateHypotheses(
     apiKey,
     model: model ?? "gpt-4o-mini",
     messages: [
-      { role: "system", content: INTERPRETER_SYSTEM_PROMPT },
+      { role: "system", content: buildInterpreterSystemPrompt(language) },
       {
         role: "user",
         content: buildInterpreterUserPrompt({

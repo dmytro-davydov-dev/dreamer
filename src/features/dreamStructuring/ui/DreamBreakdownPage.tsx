@@ -351,7 +351,7 @@ export default function DreamBreakdownPage({
   dreamId,
   onContinue,
 }: DreamBreakdownPageProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [dream, setDream] = useState<DreamDoc | null>(null);
   const [elements, setElements] = useState<LocalElement[]>([]);
@@ -413,6 +413,7 @@ export default function DreamBreakdownPage({
         dreamId,
         rawText: dream.rawText,
         apiKey,
+        language: i18n.language,
       });
       setElements(result.elements);
       setPageStatus("ready");

@@ -64,7 +64,7 @@ export default function InterpretationPage({
   dreamId,
   onContinue,
 }: InterpretationPageProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
   const [dream, setDream] = useState<DreamDoc | null>(null);
   const [elements, setElements] = useState<Array<{ id: ElementId; data: DreamElementDoc }>>([]);
@@ -130,6 +130,7 @@ export default function InterpretationPage({
         elements,
         associations,
         apiKey,
+        language: i18n.language,
       });
 
       setHypotheses(result.hypotheses);

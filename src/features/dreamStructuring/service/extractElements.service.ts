@@ -14,7 +14,7 @@ import { doc, collection } from "firebase/firestore";
 import { callLlm, LlmError, type LlmCallOptions } from "../../../services/ai/client/llmClient";
 import { analytics, startAiTimer } from "../../../services/analytics";
 import {
-  EXTRACTOR_SYSTEM_PROMPT,
+  buildExtractorSystemPrompt,
   buildExtractorUserPrompt,
 } from "../../../services/ai/prompts/extractor";
 import {
@@ -40,6 +40,7 @@ export interface ExtractElementsOptions {
   dreamId: DreamId;
   rawText: string;
   apiKey: string;
+  language?: string;
   model?: string;
 }
 
@@ -53,13 +54,13 @@ export interface ExtractElementsResult {
 export async function extractElements(
   options: ExtractElementsOptions
 ): Promise<ExtractElementsResult> {
-  const { db, uid, dreamId, rawText, apiKey, model } = options;
+  const { db, uid, dreamId, rawText, apiKey, language, model } = options;
 
   const llmOptions: LlmCallOptions = {
     apiKey,
     model: model ?? "gpt-4o-mini",
     messages: [
-      { role: "system", content: EXTRACTOR_SYSTEM_PROMPT },
+      { role: "system", content: buildExtractorSystemPrompt(language) },
       { role: "user", content: buildExtractorUserPrompt(rawText) },
     ],
     jsonSchema: {
