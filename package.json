@@ -21,6 +21,7 @@
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
     "@sentry/browser": "^10.53.1",
+    "@sentry/react": "^10.53.1",
     "firebase": "^12.9.0",
     "posthog-js": "^1.373.4",
     "react": "^18.3.1",

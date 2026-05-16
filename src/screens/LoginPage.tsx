@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { signInWithEmail, signUpWithEmail, signInAsGuest } from "../app/config/firebase";
+import { identifyUser } from "../services/analytics";
 
 type Mode = "signin" | "signup";
 
@@ -65,10 +66,20 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signin") {
-        await signInWithEmail(email, password);
+        const cred = await signInWithEmail(email, password);
+        identifyUser(cred.user.uid, {
+          plan: "byok",
+          totalDreams: 0,
+          signupDate: cred.user.metadata.creationTime ?? new Date().toISOString(),
+        });
         navigate("/dashboard");
       } else {
-        await signUpWithEmail(email, password);
+        const cred = await signUpWithEmail(email, password);
+        identifyUser(cred.user.uid, {
+          plan: "byok",
+          totalDreams: 0,
+          signupDate: cred.user.metadata.creationTime ?? new Date().toISOString(),
+        });
         navigate("/about");
       }
     } catch (err) {

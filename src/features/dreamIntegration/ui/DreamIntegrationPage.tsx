@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { NavLink } from "react-router";
 import type { DreamId } from "../../../shared/types/domain";
@@ -24,13 +24,12 @@ function getWordCountBucket(text: string): WordCountBucket {
 
 export default function DreamIntegrationPage({ dreamId }: DreamIntegrationPageProps) {
   const [journalText, setJournalText] = useState("");
+  const integrationFiredRef = useRef(false);
 
-  useEffect(() => {
-    if (dreamId) {
-      analytics.capture("integration_triggered", {});
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (dreamId && !integrationFiredRef.current) {
+    integrationFiredRef.current = true;
+    analytics.capture("integration_triggered", {});
+  }
 
   const handleJournalBlur = () => {
     if (journalText.trim().length > 0) {

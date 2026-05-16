@@ -80,14 +80,23 @@ export default function DashboardPage({ onDreamSelect }: DashboardPageProps) {
       if (dreams.length > 0) {
         analytics.capture("dream_history_opened", { totalDreamsOnRecord: dreams.length });
       }
+      if (dreams.length === 1) {
+        const firstDream = dreams[0];
+        const createdAtMs = firstDream.data.createdAt.toDate().getTime();
+        const minutesFromCaptureToDone = Math.round((Date.now() - createdAtMs) / 60_000);
+        analytics.capture("first_dream_completed", { minutesFromCaptureToDone });
+      }
     }
-  }, [loading, dreams.length]);
+  }, [loading, dreams]);
 
   const handleRecordDream = () => {
     navigate("/dreams/new");
   };
 
   const handleDreamClick = (dreamId: DreamId) => {
+    if (dreams.length > 0) {
+      analytics.capture("past_dream_replayed", {});
+    }
     onDreamSelect?.(dreamId);
     navigate(`/dreams/${dreamId}`);
   };
