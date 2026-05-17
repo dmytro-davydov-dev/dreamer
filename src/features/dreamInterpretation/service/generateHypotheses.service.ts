@@ -51,9 +51,6 @@ export interface GenerateHypothesesResult {
   hypotheses: Array<{ id: HypothesisId; data: HypothesisDoc }>;
 }
 
-const HYPOTHESIS_PREFIX_RE =
-  /^(could be|one possibility is|this could suggest|the dream may point to)/i;
-
 const INTERPRETER_LENSES: JungianLens[] = [
   "compensation",
   "shadow",
@@ -62,11 +59,21 @@ const INTERPRETER_LENSES: JungianLens[] = [
   "individuation",
 ];
 
-function enforceHypothesisFraming(text: string): string {
+function enforceHypothesisFraming(text: string, language = "en"): string {
   const trimmed = text.trim();
-  if (HYPOTHESIS_PREFIX_RE.test(trimmed)) {
+  if (!trimmed) return trimmed;
+
+  // Only prepend an English fallback prefix when generating in English and
+  // the LLM did not already use hedged framing. For other languages the
+  // system prompt already requires hypothesis framing in the target language,
+  // so adding an English prefix here would corrupt the output.
+  if (language.split("-")[0].toLowerCase() !== "en") {
     return trimmed;
   }
+
+  const EN_PREFIX_RE =
+    /^(could be|one possibility is|this could suggest|the dream may point to)/i;
+  if (EN_PREFIX_RE.test(trimmed)) return trimmed;
   return `Could be that ${trimmed.charAt(0).toLowerCase()}${trimmed.slice(1)}`;
 }
 
@@ -246,7 +253,7 @@ export async function generateHypotheses(
 
       const data: HypothesisDoc = {
         lens,
-        hypothesisText: enforceHypothesisFraming(hyp.hypothesisText),
+        hypothesisText: enforceHypothesisFraming(hyp.hypothesisText, language),
         evidence: normalizedEvidence,
         reflectiveQuestion: hyp.reflectiveQuestion,
         createdAt,
